@@ -1,0 +1,541 @@
+/* ── Module Preset Panel ──────────────────────────────────────────────────── */
+.preset-panel {
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: center;
+}
+
+.preset-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.preset-category-select {
+  flex: 0 0 auto;
+  min-width: 75px;
+}
+
+.preset-name-select {
+  flex: 1 1 120px;
+  min-width: 0;
+}
+
+.preset-load-btn,
+.preset-save-btn {
+  font-family: var(--font-main);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.preset-load-btn {
+  background: rgba(0, 229, 255, 0.08);
+  color: var(--accent-cyan);
+  border-color: rgba(0, 229, 255, 0.3);
+}
+
+.preset-load-btn:hover {
+  background: rgba(0, 229, 255, 0.18);
+  border-color: var(--accent-cyan);
+}
+
+.preset-save-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+}
+
+.preset-save-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.preset-load-btn:active,
+.preset-save-btn:active {
+  transform: scale(0.96);
+}
+
+/* ── Settings Drawer — Preset IO Panel ───────────────────────────────────── */
+.presets-export-panel h3 {
+  font-size: 0.8rem;
+  margin: 0 0 0.75rem 0;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+}
+
+.preset-io-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.preset-io-btn {
+  font-family: var(--font-main);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  flex: 1;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 229, 255, 0.08);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  color: var(--accent-cyan);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.preset-io-btn:hover {
+  background: rgba(0, 229, 255, 0.18);
+  border-color: var(--accent-cyan);
+}
+
+.preset-io-btn:active {
+  transform: scale(0.97);
+}
+
+.preset-import-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Context Menu ──────────────────────────────────────────────────────────── */
+
+.ctx-menu {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  min-width: 190px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-hover);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--glass-shadow), 0 2px 8px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 4px 0;
+  user-select: none;
+}
+
+.ctx-menu.open {
+  display: block;
+  animation: ctx-appear 0.1s ease;
+}
+
+@keyframes ctx-appear {
+  from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.ctx-item {
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.ctx-item:hover {
+  background: var(--glass-bg-hover);
+}
+
+.ctx-item.disabled {
+  color: var(--text-dim);
+  cursor: default;
+  pointer-events: none;
+}
+
+.ctx-sep {
+  height: 1px;
+  margin: 3px 0;
+  background: var(--glass-border);
+}
+
+/* ── Preset Dropdown Menu ─────────────────────────────────────────────────── */
+
+.preset-menu-btn {
+  font-family: var(--font-main);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  background: rgba(0, 229, 255, 0.08);
+  color: var(--accent-cyan);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.preset-menu-btn:hover {
+  background: rgba(0, 229, 255, 0.18);
+  border-color: var(--accent-cyan);
+}
+
+.preset-menu-btn:active,
+.preset-menu-btn.open {
+  background: rgba(0, 229, 255, 0.22);
+  border-color: var(--accent-cyan);
+  transform: scale(0.97);
+}
+
+/* ── Shared panel shell ── */
+.preset-dropdown {
+  position: fixed;
+  z-index: 9999;
+  min-width: 190px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-hover);
+  border-radius: var(--radius-md);
+  box-shadow: var(--glass-shadow), 0 6px 28px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  padding: 5px 0;
+  user-select: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--glass-border-hover) transparent;
+}
+
+.preset-dropdown::-webkit-scrollbar { width: 4px; }
+.preset-dropdown::-webkit-scrollbar-track { background: transparent; }
+.preset-dropdown::-webkit-scrollbar-thumb {
+  background: var(--glass-border-hover);
+  border-radius: 2px;
+}
+
+/* Primary panel pops in from above */
+.preset-dropdown:not(.preset-dropdown--sub) {
+  animation: pdrop-appear 0.16s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+/* Sub-panel slides in from the left edge */
+.preset-dropdown--sub {
+  min-width: 220px;
+  animation: pdrop-sub-appear 0.14s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+@keyframes pdrop-appear {
+  from { opacity: 0; transform: scale(0.94) translateY(-8px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+@keyframes pdrop-sub-appear {
+  from { opacity: 0; transform: scale(0.96) translateX(-8px); }
+  to   { opacity: 1; transform: scale(1)    translateX(0); }
+}
+
+/* ── Category rows (Kick / Snare / Shaker) ── */
+.pdrop-item--cat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px 8px 14px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: default;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.pdrop-item--cat:hover,
+.pdrop-item--cat-active {
+  background: var(--glass-bg-hover);
+  color: var(--text-primary);
+}
+
+.pdrop-item-label {
+  flex: 1;
+}
+
+.pdrop-cat-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.07);
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+.pdrop-item--cat-active .pdrop-cat-badge {
+  background: rgba(0, 229, 255, 0.12);
+  color: var(--accent-cyan);
+}
+
+.pdrop-flyout-arrow {
+  font-size: 1rem;
+  color: var(--text-dim);
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.pdrop-item--cat:hover .pdrop-flyout-arrow,
+.pdrop-item--cat-active .pdrop-flyout-arrow {
+  color: var(--text-secondary);
+  transform: translateX(2px);
+}
+
+/* ── Preset items (inside sub-panel or arp flat list) ── */
+.pdrop-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px 7px 14px;
+  font-size: 0.83rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.pdrop-item:hover {
+  background: var(--glass-bg-hover);
+}
+
+.pdrop-item:active {
+  background: rgba(0, 229, 255, 0.08);
+}
+
+/* User preset items */
+.pdrop-item--user {
+  color: var(--text-primary);
+}
+
+.pdrop-item-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pdrop-item-delete {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1rem;
+  line-height: 1;
+  padding: 1px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: color var(--transition-fast), background var(--transition-fast), opacity var(--transition-fast);
+  font-family: var(--font-main);
+}
+
+.pdrop-item--user:hover .pdrop-item-delete {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.pdrop-item-delete:hover {
+  color: var(--state-panic);
+  background: rgba(255, 23, 68, 0.12);
+}
+
+/* ── Separator ── */
+.pdrop-sep {
+  height: 1px;
+  margin: 4px 10px;
+  background: var(--glass-border);
+}
+
+/* ── Save item ── */
+.pdrop-save-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.pdrop-save-item:hover {
+  background: var(--glass-bg-hover);
+  color: var(--text-primary);
+}
+
+.pdrop-save-item:active {
+  background: rgba(0, 229, 255, 0.07);
+}
+
+.pdrop-save-icon {
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: var(--accent-cyan);
+  line-height: 1;
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+.pdrop-save-item:hover .pdrop-save-icon {
+  opacity: 1;
+}
+
+/* ── Settings Drawer — Show Files Panel ─────────────────────────────────── */
+.show-files-panel h3 {
+  font-size: 0.8rem;
+  margin: 0 0 0.75rem 0;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+}
+
+.show-active-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.show-active-label {
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.show-active-name {
+  color: var(--accent-cyan);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.show-control-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.show-list-container {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.15);
+  margin-bottom: 0.75rem;
+  scrollbar-width: thin;
+}
+
+.local-shows-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.show-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.show-item-row:last-child {
+  border-bottom: none;
+}
+
+.show-item-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.show-item-row.active {
+  background: rgba(0, 229, 255, 0.05);
+  border-left: 2px solid var(--accent-cyan);
+}
+
+.show-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.show-item-name-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.show-item-row.active .show-item-name-text {
+  color: var(--accent-cyan);
+}
+
+.show-item-date {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+.show-item-actions {
+  display: flex;
+  gap: 6px;
+  opacity: 0.3;
+  transition: opacity var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.show-item-row:hover .show-item-actions {
+  opacity: 1;
+}
+
+.show-action-button {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.show-action-button:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.show-action-button.delete:hover {
+  color: var(--state-panic);
+  background: rgba(255, 23, 68, 0.1);
+}
+
+.show-import-row {
+  margin-top: 0.5rem;
+}
+

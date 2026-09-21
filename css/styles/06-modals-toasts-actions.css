@@ -1,0 +1,573 @@
+/* ========================================= */
+/* Section Card Top-Right Delete Button      */
+/* ========================================= */
+
+.section-delete-btn-top {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: var(--transition-fast);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.section-delete-btn-top:hover {
+  background: var(--state-panic);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+  box-shadow: 0 2px 10px rgba(255, 23, 68, 0.4);
+}
+
+/* ========================================= */
+/* Custom Input Modal                        */
+/* ========================================= */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal-content {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  transform: translateY(20px) scale(0.95);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.modal-overlay.open .modal-content {
+  transform: translateY(0) scale(1);
+}
+
+.modal-content h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+}
+
+.modal-content input {
+  width: 100%;
+  font-size: 1.1rem;
+  padding: 0.75rem 1rem;
+  box-sizing: border-box;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--glass-border);
+  border-radius: var(--radius-md);
+}
+
+.modal-content input:focus {
+  border-color: var(--accent-magenta);
+  box-shadow: 0 0 15px rgba(255, 0, 127, 0.2);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.modal-actions button {
+  flex: 1;
+}
+
+/* ========================================= */
+/* Toast Notifications                       */
+/* ========================================= */
+
+.fk-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(22, 24, 38, 0.9);
+  border: 1px solid var(--glass-border-hover);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  font-weight: 600;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 2000;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.fk-toast--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.fk-toast--success {
+  border-color: rgba(0, 230, 118, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 230, 118, 0.15);
+}
+
+.fk-toast--error {
+  border-color: rgba(255, 23, 68, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 23, 68, 0.15);
+}
+
+/* ========================================= */
+/* Inline Editing                            */
+/* ========================================= */
+
+.inline-edit-input {
+  background: rgba(0, 0, 0, 0.6) !important;
+  border: 2px solid var(--accent-cyan) !important;
+  border-radius: var(--radius-sm) !important;
+  color: white !important;
+  font-family: var(--font-main) !important;
+  font-weight: 600 !important;
+  padding: 0.25rem 0.5rem !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  font-size: inherit !important;
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.2) !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+}
+
+.section-card-name {
+  cursor: default;
+  position: relative;
+  z-index: 2;
+}
+
+/* ========================================= */
+/* Module Badges on Section Cards            */
+/* ========================================= */
+
+.section-badges {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+}
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  background: color-mix(in srgb, var(--badge-color) 25%, transparent);
+  color: var(--badge-color);
+  border: 1px solid color-mix(in srgb, var(--badge-color) 40%, transparent);
+}
+
+/* ========================================= */
+/* Section Action Buttons (polished)         */
+/* ========================================= */
+
+.section-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-main);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.section-action-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-color: var(--glass-border-hover);
+}
+
+.section-action-btn:active {
+  transform: scale(0.95);
+}
+
+.section-action-btn.update-btn:hover {
+  background: rgba(0, 229, 255, 0.15);
+  border-color: rgba(0, 229, 255, 0.4);
+  color: var(--accent-cyan);
+}
+
+.section-action-btn.delete-btn {
+  font-size: 1rem;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+}
+
+.section-action-btn.delete-btn:hover {
+  background: rgba(255, 23, 68, 0.15);
+  border-color: rgba(255, 23, 68, 0.4);
+  color: #ff4d6d;
+}
+
+/* Flash confirmation on update */
+@keyframes flashConfirm {
+  0% {
+    box-shadow: inset 0 0 0 rgba(0, 230, 118, 0);
+  }
+
+  30% {
+    box-shadow: inset 0 0 30px rgba(0, 230, 118, 0.25), 0 0 20px rgba(0, 230, 118, 0.2);
+  }
+
+  100% {
+    box-shadow: inset 0 0 0 rgba(0, 230, 118, 0);
+  }
+}
+
+.section-card.flash-confirm {
+  animation: flashConfirm 0.6s ease;
+}
+
+/* ========================================= */
+/* Item Actions (song list)                  */
+/* ========================================= */
+
+.item-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* ========================================= */
+/* Micro-interaction: button active states    */
+/* ========================================= */
+
+button,
+.icon-btn,
+.save-section-btn {
+  transition: var(--transition-fast);
+}
+
+button:active,
+.icon-btn:active,
+.save-section-btn:active {
+  transform: scale(0.95);
+}
+
+.icon-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: var(--transition-fast);
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: var(--glass-border-hover);
+}
+
+.icon-btn.nav-btn-large {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.icon-btn.nav-btn-large:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 229, 255, 0.2);
+}
+
+.icon-btn.nav-btn-large:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(0, 229, 255, 0.1);
+}
+
+.icon-btn.delete-btn:hover {
+  background: rgba(255, 23, 68, 0.15);
+  border-color: rgba(255, 23, 68, 0.4);
+  color: #ff4d6d;
+}
+
+/* Live content header alignment */
+.live-content-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Empty state styling */
+.empty-state {
+  color: var(--text-dim);
+  text-align: center;
+  padding: 3rem;
+  font-size: 0.95rem;
+  grid-column: 1 / -1;
+}
+
+/* ========================================= */
+/* Utility Classes                           */
+/* ========================================= */
+
+.ml-sm {
+  margin-left: 10px;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+/* ========================================= */
+/* Module Descriptions                       */
+/* ========================================= */
+
+.module-description {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* ========================================= */
+/* Top Bar Actions                           */
+/* ========================================= */
+
+.top-bar-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.settings-icon-btn {
+  background: none !important;
+  border: none !important;
+  color: var(--text-primary);
+  cursor: pointer;
+  width: auto;
+  height: auto;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+}
+
+.settings-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--accent-cyan);
+  transform: scale(1.1);
+}
+
+.panic-icon {
+  margin-right: 6px;
+  vertical-align: text-bottom;
+}
+
+/* ========================================= */
+/* TAP Tempo & BPM Input                     */
+/* ========================================= */
+
+.bpm-input {
+  width: 60px;
+}
+
+.tap-btn {
+  margin-left: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-main);
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  background: rgba(255, 0, 127, 0.15);
+  color: var(--accent-magenta);
+  border: 1px solid rgba(255, 0, 127, 0.3);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.tap-btn:hover {
+  background: var(--accent-magenta);
+  color: white;
+  box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+}
+
+.tap-btn:active {
+  transform: scale(0.92);
+}
+
+.tap-btn--small {
+  padding: 2px 10px;
+  font-size: 0.7rem;
+  margin-left: 4px;
+}
+
+.save-bpm-btn {
+  width: 100%;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-main);
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  background: rgba(0, 229, 255, 0.08);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-transform: uppercase;
+}
+
+.save-bpm-btn:hover {
+  background: rgba(0, 229, 255, 0.18);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
+}
+
+.save-bpm-btn:active {
+  transform: scale(0.96);
+}
+
+/* ========================================= */
+/* Add Song Button (Live sidebar)            */
+/* ========================================= */
+
+.add-song-btn {
+  display: none;
+  margin-left: 0.5rem;
+}
+
+/* ========================================= */
+/* Modal Button Styles                       */
+/* ========================================= */
+
+.modal-cancel-btn {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--glass-border);
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-main);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.modal-cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border-color: var(--glass-border-hover);
+}
+
+.modal-save-btn {
+  background: var(--accent-magenta);
+  color: white;
+  border: 1px solid transparent;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-main);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.modal-save-btn:hover {
+  box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
+  transform: translateY(-1px);
+}
+
+.modal-subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-top: -1rem;
+  margin-bottom: 0.5rem;
+  display: none;
+  line-height: 1.4;
+}
+
+/* ========================================= */
+/* Mapping Controls                          */
+/* ========================================= */
+
+.mapping-control-row {
+  margin-bottom: 10px;
+}
+
+/* ========================================= */
+/* Icon Span (used in lock/unlock toggle)    */
+/* ========================================= */
+
+.icon-span {
+  display: flex;
+  align-items: center;
+}
+
+/* ========================================= */
+/* Card Hover & Section Card (refined)       */
+/* ========================================= */
+
+.section-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}

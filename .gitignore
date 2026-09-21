@@ -1,0 +1,20 @@
+# Dependencies and generated deployment files
+node_modules/
+/dist/
+.vercel/
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local tooling, logs, and OS files
+.claude/
+.codex/
+.DS_Store
+*.log
+__pycache__/
+*.pyc
+.venv/

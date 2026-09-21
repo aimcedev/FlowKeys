@@ -1,0 +1,2413 @@
+/* Main Content Area */
+main.workspace {
+  display: flex;
+  flex: 1;
+  gap: 1.5rem;
+  overflow: hidden;
+}
+
+/* Routing / Pass-through Section (Left) */
+.routing-sidebar {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  flex-shrink: 0;
+  padding-top: 1.5rem;
+  overflow-y: auto;
+  max-height: 100%;
+  padding-right: 0.4rem;
+  margin-right: -0.4rem;
+  /* Aligns with modules-grid */
+  view-transition-name: routing-sidebar;
+}
+
+.routing-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.routing-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.routing-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.routing-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Activity Vis (Bottom Left) */
+.activity-view {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--glass-shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-view h2 {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-weight: 800;
+  margin: 0 0 0.75rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Pass-through Config */
+.pass-through-panel {
+  background: linear-gradient(145deg, rgba(26, 30, 48, 0.5), rgba(16, 18, 28, 0.7));
+  border: 1px solid var(--glass-border);
+  border-left: 4px solid var(--color-pass);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--glass-shadow);
+}
+
+.pass-through-panel h2 {
+  font-size: 0.8rem;
+  margin: 0 0 0.75rem 0;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+}
+
+.pass-through-panel p {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin: 0 0 1.25rem 0;
+}
+
+/* Modules Grid (Right) */
+.modules-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 340px));
+  justify-content: center;
+  align-content: start;
+  gap: 1.25rem;
+  overflow-y: auto;
+  padding: 1.5rem 0.5rem 2rem 0.5rem;
+}
+
+/* Module Card */
+.module-card {
+  background: rgba(22, 24, 38, 0.88);
+  border: 1px solid var(--glass-border);
+  border-left: 3px solid color-mix(in srgb, var(--mod-color) 30%, transparent);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--glass-shadow);
+  position: relative;
+  contain: layout style;
+  transition: transform var(--transition-medium), box-shadow var(--transition-medium), border-color var(--transition-fast), border-left-color var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ── Add Module FAB (Floating Action Button) ─────────────────────────────── */
+/* Hidden by default — shown only at ≤900px via 04-responsive.css */
+.add-module-fab {
+  display: none;
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 150;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  border: none;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 229, 255, 0.35), 0 2px 8px rgba(0, 0, 0, 0.4);
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+}
+
+.add-module-fab:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 24px rgba(0, 229, 255, 0.5), 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+.add-module-fab:active {
+  transform: scale(0.96);
+}
+
+/* Rotate the + into × when the drawer is open */
+.add-module-fab.drawer-open svg {
+  transform: rotate(45deg);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.add-module-fab:not(.drawer-open) svg {
+  transform: rotate(0deg);
+  transition: transform 0.2s ease;
+}
+
+/* Map specific unique View Transition Names to animate them individually */
+#card-bass {
+  view-transition-name: card-bass;
+}
+
+#card-arp {
+  view-transition-name: card-arp;
+}
+
+#card-pad {
+  view-transition-name: card-pad;
+}
+
+#card-kick {
+  view-transition-name: card-kick;
+}
+
+#card-snare {
+  view-transition-name: card-snare;
+}
+
+#card-shaker {
+  view-transition-name: card-shaker;
+}
+
+
+.live-sidebar {
+  view-transition-name: live-sidebar;
+}
+
+.live-content {
+  view-transition-name: live-content;
+}
+
+.module-card:hover {
+  background: var(--glass-bg-hover);
+  border-top-color: rgba(255, 255, 255, 0.15);
+  border-right-color: rgba(255, 255, 255, 0.15);
+  border-bottom-color: rgba(255, 255, 255, 0.15);
+  border-left-color: color-mix(in srgb, var(--mod-color) 55%, transparent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+
+
+.module-card.bass {
+  --mod-color: var(--color-bass);
+}
+
+.module-card.arp {
+  --mod-color: var(--color-arp);
+}
+
+.module-card.pad {
+  --mod-color: var(--color-pad);
+}
+
+.module-card.percussion {
+  --mod-color: var(--color-percussion);
+}
+
+.module-card.kick {
+  --mod-color: var(--color-kick);
+}
+
+.module-card.snare {
+  --mod-color: var(--color-snare);
+}
+
+.module-card.shaker {
+  --mod-color: var(--color-shaker);
+}
+
+.module-card.keyboard {
+  --mod-color: var(--color-keyboard);
+}
+
+.module-card.looper {
+  --mod-color: var(--color-looper);
+}
+
+.module-card.swell {
+  --mod-color: var(--color-swell);
+}
+
+/* ── Looper Module Controls ───────────────────────────────────────────────── */
+
+.looper-viz-container {
+  position: relative;
+  width: 100%;
+  height: 60px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-sizing: border-box;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+
+.looper-viz-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.looper-status-text {
+  position: absolute;
+  right: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  pointer-events: none;
+  user-select: none;
+  transition: color var(--transition-fast);
+}
+
+.module-card.looper-armed .looper-status-text {
+  color: var(--color-looper);
+}
+
+.module-card.looper-recording .looper-status-text {
+  color: #ff3838;
+}
+
+.module-card.looper-playing .looper-status-text {
+  color: var(--color-looper);
+}
+
+/* Transport row */
+.looper-transport {
+  display: flex;
+  gap: 0.5rem;
+  /* No margin-top — the display region's flex gap handles spacing now that
+     the transport sits above the waveform inside the RECORD region. */
+}
+
+/* Shared button base */
+.looper-arm-btn,
+.looper-clear-btn {
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+  padding: 0.45rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+}
+
+.looper-arm-btn {
+  flex: 1;
+}
+
+.looper-arm-btn:hover {
+  background: rgba(255, 107, 53, 0.15);
+  border-color: var(--color-looper);
+  color: var(--color-looper);
+}
+
+.looper-clear-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: var(--text-primary);
+}
+
+/* Active state overrides */
+.module-card.looper-armed .looper-arm-btn {
+  background: rgba(255, 107, 53, 0.12);
+  border-color: var(--color-looper);
+  color: var(--color-looper);
+}
+
+.module-card.looper-recording .looper-arm-btn {
+  background: rgba(255, 56, 56, 0.15);
+  border-color: #ff3838;
+  color: #ff3838;
+}
+
+.module-card.looper-playing .looper-arm-btn {
+  background: rgba(255, 107, 53, 0.1);
+  border-color: var(--color-looper);
+  color: var(--color-looper);
+}
+
+/* LED indicator dot inside ARM button */
+.looper-led {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  flex-shrink: 0;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.looper-led.led-armed {
+  background: var(--color-looper);
+  box-shadow: 0 0 6px var(--color-looper);
+  animation: looper-pulse 1s ease-in-out infinite;
+}
+
+.looper-led.led-rec {
+  background: #ff3838;
+  box-shadow: 0 0 8px #ff3838;
+  animation: looper-pulse 0.5s ease-in-out infinite;
+}
+
+.looper-led.led-playing {
+  background: var(--color-looper);
+  box-shadow: 0 0 8px var(--color-looper);
+}
+
+@keyframes looper-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}
+
+/* Palette bar color */
+.palette-tile[data-palette-type="looper"] .palette-tile-bar {
+  background: var(--color-looper);
+}
+
+html[data-theme="light"] .looper-viz-container {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+
+/* ── Keyboard Module Controls ─────────────────────────────────────────────── */
+
+.kb-modwheel-section {
+  margin-top: 0.5rem;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.75rem 0.65rem;
+}
+
+.kb-modwheel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.45rem;
+}
+
+.kb-modwheel-header label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.kb-modwheel-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-keyboard);
+  min-width: 2.2ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.kb-modwheel-slider {
+  width: 100%;
+  height: 22px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+  display: block;
+}
+
+.kb-modwheel-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.kb-modwheel-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-keyboard);
+  margin-top: -7px;
+  box-shadow: 0 0 8px rgba(0, 229, 160, 0.45);
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.kb-modwheel-slider:hover::-webkit-slider-thumb {
+  box-shadow: 0 0 14px rgba(0, 229, 160, 0.7);
+  transform: scale(1.12);
+}
+
+.kb-modwheel-slider:active::-webkit-slider-thumb {
+  box-shadow: 0 0 18px rgba(0, 229, 160, 0.9);
+  transform: scale(1.18);
+}
+
+.kb-modwheel-slider::-moz-range-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.kb-modwheel-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-keyboard);
+  border: none;
+  box-shadow: 0 0 8px rgba(0, 229, 160, 0.45);
+}
+
+.kb-transition-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: nowrap;
+}
+
+.kb-transition-input {
+  width: 72px !important;
+  flex-shrink: 0;
+}
+
+.kb-transition-unit {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.kb-transition-hint {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  font-style: italic;
+  white-space: nowrap;
+}
+
+html[data-theme="light"] .kb-modwheel-section {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+html[data-theme="light"] .kb-modwheel-slider::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+html[data-theme="light"] .kb-modwheel-slider::-moz-range-track {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+html[data-theme="light"] .kb-modwheel-slider::-webkit-slider-thumb {
+  box-shadow: 0 0 8px rgba(0, 168, 114, 0.4);
+}
+
+html[data-theme="light"] .kb-modwheel-slider:hover::-webkit-slider-thumb {
+  box-shadow: 0 0 14px rgba(0, 168, 114, 0.6);
+}
+
+.palette-tile[data-palette-type="keyboard"] .palette-tile-bar {
+  background: var(--color-keyboard);
+}
+
+.module-card.active {
+  border-color: var(--mod-color);
+  /* left is already 3px wide from base — border-color applies full mod-color to it */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), -1px 0 16px -4px color-mix(in srgb, var(--mod-color) 45%, transparent);
+}
+
+.module-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: color-mix(in srgb, var(--mod-color) 7%, transparent);
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.55rem;
+  margin: -0.25rem;
+}
+
+/* Drag handle / glyph / actions hold their size; only the title flexes */
+.module-header > .drag-handle,
+.module-header > .module-glyph,
+.module-header > .module-header-actions {
+  flex-shrink: 0;
+}
+
+.module-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.module-title-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--glass-border);
+}
+
+.module-card.active .module-title-dot {
+  background: var(--mod-color);
+  box-shadow: 0 0 12px var(--mod-color);
+}
+
+.module-title h3 {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: text;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  transition: background 0.15s;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.module-title h3:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.module-title h3:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ── Module Glyph Icon ───────────────────────────────────────────────────── */
+
+.module-glyph {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--mod-color);
+  opacity: 0.55;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity var(--transition-fast);
+}
+
+.module-glyph svg {
+  width: 16px;
+  height: 16px;
+}
+
+.module-card.active .module-glyph {
+  opacity: 1;
+}
+
+/* ── Channel Chip Select ─────────────────────────────────────────────────── */
+
+.chan-chip {
+  appearance: none;
+  -webkit-appearance: none;
+  background: color-mix(in srgb, var(--mod-color) 10%, rgba(0, 0, 0, 0.25));
+  background-image: none;
+  border: 1px solid color-mix(in srgb, var(--mod-color) 35%, transparent);
+  border-radius: var(--radius-pill);
+  color: var(--text-dim);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-family: var(--font-main);
+  padding: 3px 9px;
+  width: 56px;
+  min-width: 56px; /* override base `select { min-width: 140px }` which was squeezing the title */
+  box-sizing: border-box;
+  text-align: center;
+  text-align-last: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.chan-chip:hover {
+  background: color-mix(in srgb, var(--mod-color) 20%, rgba(0, 0, 0, 0.2));
+  border-color: color-mix(in srgb, var(--mod-color) 60%, transparent);
+  color: var(--text-secondary);
+}
+
+.chan-chip:focus {
+  outline: none;
+  border-color: var(--mod-color);
+  color: var(--text-primary);
+}
+
+.module-card.active .chan-chip {
+  color: color-mix(in srgb, var(--mod-color) 85%, white);
+  border-color: color-mix(in srgb, var(--mod-color) 55%, transparent);
+}
+
+/* ── Display Region (SCOPE / PATTERN / RECORD / ACTIVITY) ───────────────── */
+
+.module-display-region {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.module-display-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0.1rem;
+}
+
+.module-display-label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.module-display-readout {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Title Dot Output Flash ──────────────────────────────────────────────── */
+
+@keyframes dot-output-flash {
+  0%   { box-shadow: 0 0 16px var(--mod-color), 0 0 6px var(--mod-color); transform: scale(1.6); }
+  100% { box-shadow: 0 0 12px var(--mod-color); transform: scale(1); }
+}
+
+.module-card.active .module-title-dot.output-flash {
+  animation: dot-output-flash 0.28s ease-out forwards;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: background-color 0.3s, border-color 0.3s;
+  border-radius: 24px;
+  border: 1px solid var(--glass-border);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+input:checked+.slider {
+  background-color: var(--mod-color);
+  border-color: var(--mod-color);
+}
+
+input:checked+.slider:before {
+  transform: translateX(20px);
+}
+
+
+/* Form Controls in Modules */
+.control-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.control-row label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.control-row select,
+.control-row input {
+  width: 120px;
+  min-width: unset;
+}
+
+.control-row-wrap {
+  flex-wrap: wrap;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.control-group label {
+  white-space: nowrap;
+}
+
+
+
+/* Visualizer Canvas */
+.visualizer-container {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius-sm);
+  border: 1px inset rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+  height: 60px;
+  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.6);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 10px 10px;
+}
+
+canvas#activityCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Per-Module Frequency Activity Visualizer ──────────────────────────── */
+
+.freq-viz-container {
+  width: 100%;
+  height: 60px;
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-border);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* Subtle scanline texture matching the sequencer aesthetic */
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+
+.freq-viz-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+html[data-theme="light"] .freq-viz-container {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+
+/* Sequencer UI Component */
+.sequencer-grid {
+  display: flex;
+  gap: 4px;
+  height: 60px;
+  align-items: flex-end;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  border: 1px solid var(--glass-border);
+  margin: 0.25rem auto 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  user-select: none;
+  cursor: crosshair;
+}
+
+.seq-step {
+  flex: 1;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  position: relative;
+  cursor: crosshair;
+  transition: background 0.1s;
+}
+
+.seq-step:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.seq-step.active-step {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.seq-step.current-step {
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.seq-step .velocity-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: var(--mod-color);
+  border-radius: 2px;
+  height: 0%;
+  transition: height 0.05s, transform 0.1s;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.seq-step.active-step .velocity-bar {
+  opacity: 1;
+}
+
+/* Alternating beats of 4 (beat 2: steps 5-8, beat 4: steps 13-16) for a distinct grid pattern */
+.seq-step:nth-child(8n + 5),
+.seq-step:nth-child(8n + 6),
+.seq-step:nth-child(8n + 7),
+.seq-step:nth-child(8n + 8),
+.drums-cell:nth-child(8n + 5),
+.drums-cell:nth-child(8n + 6),
+.drums-cell:nth-child(8n + 7),
+.drums-cell:nth-child(8n + 8) {
+  background: rgba(255, 255, 255, 0.11) !important;
+}
+
+.seq-step:nth-child(8n + 5):hover,
+.seq-step:nth-child(8n + 6):hover,
+.seq-step:nth-child(8n + 7):hover,
+.seq-step:nth-child(8n + 8):hover,
+.drums-cell:nth-child(8n + 5):hover,
+.drums-cell:nth-child(8n + 6):hover,
+.drums-cell:nth-child(8n + 7):hover,
+.drums-cell:nth-child(8n + 8):hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+}
+
+/* Highly defined downbeats (steps 1, 5, 9, 13) with a distinct background */
+.seq-step:nth-child(4n + 1),
+.drums-cell:nth-child(4n + 1) {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+
+.seq-step:nth-child(4n + 1):hover,
+.drums-cell:nth-child(4n + 1):hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+}
+
+.seq-step.active-step:nth-child(4n + 1),
+.drums-cell.active:nth-child(4n + 1) {
+  background: rgba(255, 255, 255, 0.28) !important;
+}
+
+/* Light Mode Overrides for alternating beats and downbeats */
+html[data-theme="light"] .seq-step:nth-child(8n + 5),
+html[data-theme="light"] .seq-step:nth-child(8n + 6),
+html[data-theme="light"] .seq-step:nth-child(8n + 7),
+html[data-theme="light"] .seq-step:nth-child(8n + 8),
+html[data-theme="light"] .drums-cell:nth-child(8n + 5),
+html[data-theme="light"] .drums-cell:nth-child(8n + 6),
+html[data-theme="light"] .drums-cell:nth-child(8n + 7),
+html[data-theme="light"] .drums-cell:nth-child(8n + 8) {
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+html[data-theme="light"] .seq-step:nth-child(8n + 5):hover,
+html[data-theme="light"] .seq-step:nth-child(8n + 6):hover,
+html[data-theme="light"] .seq-step:nth-child(8n + 7):hover,
+html[data-theme="light"] .seq-step:nth-child(8n + 8):hover,
+html[data-theme="light"] .drums-cell:nth-child(8n + 5):hover,
+html[data-theme="light"] .drums-cell:nth-child(8n + 6):hover,
+html[data-theme="light"] .drums-cell:nth-child(8n + 7):hover,
+html[data-theme="light"] .drums-cell:nth-child(8n + 8):hover {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+
+html[data-theme="light"] .seq-step:nth-child(4n + 1),
+html[data-theme="light"] .drums-cell:nth-child(4n + 1) {
+  background: rgba(0, 0, 0, 0.12) !important;
+}
+
+html[data-theme="light"] .seq-step:nth-child(4n + 1):hover,
+html[data-theme="light"] .drums-cell:nth-child(4n + 1):hover {
+  background: rgba(0, 0, 0, 0.16) !important;
+}
+
+/* ── DAW Channel Strip & Volume Fader Styles ─────────────────────────────── */
+
+.module-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 0.55rem;
+}
+
+/* ── Card Tabs (Main / Advanced) ─────────────────────────────────────────── */
+
+.card-tabs {
+  display: flex;
+  gap: 3px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 0.45rem;
+}
+
+.card-tab-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  padding: 3px 10px;
+  text-transform: uppercase;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  line-height: 1;
+}
+
+.card-tab-btn:hover {
+  color: var(--text-secondary);
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.card-tab-btn.active {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--mod-color, var(--text-primary));
+}
+
+.card-tab-panel[hidden] {
+  display: none !important;
+}
+
+.module-main-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 0.75rem;
+  flex-grow: 1;
+}
+
+.module-controls-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.module-fader-column {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  padding-left: 0.75rem;
+  flex-shrink: 0;
+}
+
+.module-bottom-row {
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 0.65rem;
+}
+
+.channel-strip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 96px;
+}
+
+.fader-area {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.fader-container {
+  position: relative;
+  width: 44px;
+  height: 140px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: visible;
+}
+
+/* Clean fader track — scale labels live on the right side instead */
+.fader-container::before,
+.fader-container::after {
+  content: none;
+}
+
+/* White fill glow below thumb — height driven by JS */
+.fader-fill {
+  position: absolute;
+  width: 3px;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 0;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 7px rgba(255, 255, 255, 0.35), 0 0 2px rgba(255, 255, 255, 0.7);
+  border-radius: 1.5px;
+  pointer-events: none;
+  z-index: 1;
+  transition: height 0.04s linear;
+}
+
+.vertical-fader {
+  position: absolute;
+  width: 140px;
+  height: 44px;
+  transform: rotate(-90deg);
+  transform-origin: center center;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  outline: none;
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* Track — deep inset slot with subtle gradient fill */
+.vertical-fader::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(to bottom, #050506 0%, #111114 60%, #1a1a1e 100%);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(0, 0, 0, 0.6),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.vertical-fader::-moz-range-track {
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(to bottom, #050506 0%, #111114 60%, #1a1a1e 100%);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(0, 0, 0, 0.6),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Thumb — precision fader cap with machined-metal bevel + center notch */
+.vertical-fader::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 26px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    /* hairline notch */
+    linear-gradient(to bottom,
+      transparent calc(50% - 1px),
+      rgba(0, 0, 0, 0.55) calc(50% - 1px),
+      rgba(0, 0, 0, 0.55) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    /* bevel + body */
+    linear-gradient(to bottom,
+      #2c2c31 0%,
+      #3a3a40 18%,
+      #4a4a52 36%,
+      #565660 50%,
+      #4a4a52 64%,
+      #3a3a40 82%,
+      #2c2c31 100%
+    );
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.7),
+    0 1px 3px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45);
+  margin-top: -7px;
+  cursor: grab;
+  transition: box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.vertical-fader::-webkit-slider-thumb:hover {
+  filter: brightness(1.15);
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.75),
+    0 1px 4px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(var(--mod-color-rgb, 255, 255, 255), 0.25);
+}
+
+.vertical-fader:active::-webkit-slider-thumb {
+  cursor: grabbing;
+  filter: brightness(1.25);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 0 0 1.5px rgba(var(--mod-color-rgb, 255, 255, 255), 0.4);
+}
+
+.vertical-fader::-moz-range-thumb {
+  width: 26px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    linear-gradient(to bottom,
+      transparent calc(50% - 1px),
+      rgba(0, 0, 0, 0.55) calc(50% - 1px),
+      rgba(0, 0, 0, 0.55) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    linear-gradient(to bottom,
+      #2c2c31 0%,
+      #3a3a40 18%,
+      #4a4a52 36%,
+      #565660 50%,
+      #4a4a52 64%,
+      #3a3a40 82%,
+      #2c2c31 100%
+    );
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.7),
+    0 1px 3px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45);
+  cursor: grab;
+  transition: box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.vertical-fader::-moz-range-thumb:hover {
+  filter: brightness(1.15);
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.75),
+    0 1px 4px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.vertical-fader:active::-moz-range-thumb {
+  cursor: grabbing;
+  filter: brightness(1.25);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Level Meter styles */
+.meter-container {
+  width: 14px;
+  height: 140px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.9);
+  flex-shrink: 0;
+}
+
+.meter-bg {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  /* Faint slot pattern visible at zero level */
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.022) 0px,
+    rgba(255, 255, 255, 0.022) 6px,
+    rgba(0, 0, 0, 0.28) 6px,
+    rgba(0, 0, 0, 0.28) 8px
+  );
+}
+
+.meter-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, #00e5ff 0%, #00c4e8 45%, #22b8e0 80%, #48cae4 100%);
+  transform-origin: bottom center;
+  transform: scaleY(0);
+  will-change: transform;
+  /* Segmented LED look via CSS mask */
+  -webkit-mask-image: repeating-linear-gradient(
+    to top,
+    black 0px,
+    black 6px,
+    transparent 6px,
+    transparent 8px
+  );
+  mask-image: repeating-linear-gradient(
+    to top,
+    black 0px,
+    black 6px,
+    transparent 6px,
+    transparent 8px
+  );
+  box-shadow: 0 0 6px rgba(0, 229, 255, 0.45);
+}
+
+.meter-peak {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #ffea00;
+  bottom: 0%;
+  will-change: bottom;
+  box-shadow: 0 0 5px #ffea00;
+  pointer-events: none;
+}
+
+/* ── dB Readout ──────────────────────────────────────────────────────────── */
+.db-readout {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 0.6rem;
+  font-family: var(--font-mono, monospace);
+  color: var(--accent-cyan, #00e5ff);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  user-select: none;
+}
+
+.db-readout-input {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  appearance: textfield;
+}
+
+/* Hide spin buttons in input type=number */
+.db-readout-input::-webkit-outer-spin-button,
+.db-readout-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ── Fader dB Scale ────────────────────────────────────────────────────── */
+.fader-scale {
+  position: relative;
+  width: 20px;
+  height: 140px;
+  flex-shrink: 0;
+}
+
+.scale-label {
+  position: absolute;
+  right: 0;
+  font-size: 0.48rem;
+  font-family: var(--font-mono, monospace);
+  color: rgba(255, 255, 255, 0.28);
+  line-height: 1;
+  white-space: nowrap;
+  transform: translateY(-50%);
+  letter-spacing: -0.02em;
+}
+
+/* ── Pan Knob ──────────────────────────────────────────────────────────── */
+.cs-pan-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+}
+
+.cs-pan-knob {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  cursor: ns-resize;
+  user-select: none;
+  flex-shrink: 0;
+  outline: none;
+}
+
+.cs-pan-knob:focus-visible {
+  outline: 2px solid rgba(0, 229, 255, 0.45);
+  border-radius: 50%;
+}
+
+.cs-pan-arc {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+}
+
+.cs-pan-knob-body {
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 33%, #42424e, #1c1c24);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 5px;
+  transform: rotate(0deg);
+  transition: box-shadow 0.15s;
+}
+
+.cs-pan-knob:hover .cs-pan-knob-body {
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(0, 229, 255, 0.2);
+}
+
+.cs-pan-knob-indicator {
+  width: 2px;
+  height: 9px;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 1px;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.35);
+}
+
+.cs-pan-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 44px;
+  font-size: 0.58rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: var(--font-mono, monospace);
+  letter-spacing: 0.05em;
+}
+
+/* ── Mute / Solo Buttons ───────────────────────────────────────────────── */
+.cs-ms-row {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+}
+
+.cs-mute-btn,
+.cs-solo-btn {
+  flex: 1;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-family: var(--font-mono, monospace);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.cs-mute-btn:hover,
+.cs-solo-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.cs-mute-btn.active {
+  background: rgba(255, 70, 70, 0.18);
+  border-color: rgba(255, 100, 100, 0.55);
+  color: #ff7070;
+  box-shadow: 0 0 8px rgba(255, 70, 70, 0.25), inset 0 0 4px rgba(255, 70, 70, 0.1);
+}
+
+.cs-solo-btn.active {
+  background: rgba(255, 210, 0, 0.15);
+  border-color: rgba(255, 200, 0, 0.5);
+  color: #ffd700;
+  box-shadow: 0 0 8px rgba(255, 200, 0, 0.22), inset 0 0 4px rgba(255, 200, 0, 0.08);
+}
+
+/* Light Theme overrides */
+html[data-theme="light"] .meter-container {
+  background: rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+html[data-theme="light"] .meter-bg {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.04) 0px,
+    rgba(0, 0, 0, 0.04) 6px,
+    rgba(255, 255, 255, 0.4) 6px,
+    rgba(255, 255, 255, 0.4) 8px
+  );
+}
+
+html[data-theme="light"] .db-readout {
+  background: rgba(0, 0, 0, 0.05);
+  color: #007a8a;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+html[data-theme="light"] .scale-label {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+html[data-theme="light"] .cs-pan-labels {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="light"] .cs-pan-knob-body {
+  background: radial-gradient(circle at 38% 33%, #e4e4ec, #c4c4d0);
+  border-color: rgba(0, 0, 0, 0.14);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+html[data-theme="light"] .cs-pan-knob-indicator {
+  background: rgba(0, 0, 0, 0.72);
+  box-shadow: none;
+}
+
+html[data-theme="light"] .cs-mute-btn,
+html[data-theme="light"] .cs-solo-btn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.38);
+}
+
+html[data-theme="light"] .cs-mute-btn:hover,
+html[data-theme="light"] .cs-solo-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.7);
+}
+
+html[data-theme="light"] .fader-fill {
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: none;
+}
+
+html[data-theme="light"] .module-fader-column {
+  border-left-color: rgba(0, 0, 0, 0.08);
+}
+
+html[data-theme="light"] .module-bottom-row {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+html[data-theme="light"] .fader-container::before {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+}
+
+html[data-theme="light"] .vertical-fader::-webkit-slider-runnable-track {
+  background: linear-gradient(to bottom, #c8c8cc 0%, #d8d8dc 60%, #e0e0e4 100%);
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  box-shadow:
+    inset 0 2px 3px rgba(0, 0, 0, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+html[data-theme="light"] .vertical-fader::-moz-range-track {
+  background: linear-gradient(to bottom, #c8c8cc 0%, #d8d8dc 60%, #e0e0e4 100%);
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  box-shadow:
+    inset 0 2px 3px rgba(0, 0, 0, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+html[data-theme="light"] .vertical-fader::-webkit-slider-thumb {
+  width: 26px;
+  height: 18px;
+  background:
+    linear-gradient(to bottom,
+      transparent calc(50% - 1px),
+      rgba(0, 0, 0, 0.18) calc(50% - 1px),
+      rgba(0, 0, 0, 0.18) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    linear-gradient(to bottom,
+      #a0a0a8 0%,
+      #c4c4cc 18%,
+      #dcdce4 36%,
+      #ebebf0 50%,
+      #dcdce4 64%,
+      #c4c4cc 82%,
+      #a0a0a8 100%
+    );
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  box-shadow:
+    0 3px 7px rgba(0, 0, 0, 0.18),
+    0 1px 2px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+  margin-top: -7px;
+}
+
+html[data-theme="light"] .vertical-fader::-webkit-slider-thumb:hover {
+  filter: brightness(1.06);
+  box-shadow:
+    0 3px 9px rgba(0, 0, 0, 0.22),
+    0 1px 3px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+html[data-theme="light"] .vertical-fader:active::-webkit-slider-thumb {
+  filter: brightness(1.0);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+    0 0 0 1.5px rgba(0, 0, 0, 0.2);
+}
+
+html[data-theme="light"] .vertical-fader::-moz-range-thumb {
+  width: 26px;
+  height: 18px;
+  background:
+    linear-gradient(to bottom,
+      transparent calc(50% - 1px),
+      rgba(0, 0, 0, 0.18) calc(50% - 1px),
+      rgba(0, 0, 0, 0.18) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    linear-gradient(to bottom,
+      #a0a0a8 0%,
+      #c4c4cc 18%,
+      #dcdce4 36%,
+      #ebebf0 50%,
+      #dcdce4 64%,
+      #c4c4cc 82%,
+      #a0a0a8 100%
+    );
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  box-shadow:
+    0 3px 7px rgba(0, 0, 0, 0.18),
+    0 1px 2px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+}
+
+html[data-theme="light"] .vertical-fader::-moz-range-thumb:hover {
+  filter: brightness(1.06);
+  box-shadow:
+    0 3px 9px rgba(0, 0, 0, 0.22),
+    0 1px 3px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+}
+
+html[data-theme="light"] .vertical-fader:active::-moz-range-thumb {
+  filter: brightness(1.0);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* ── Drum Kit Module Styles ─────────────────────────────────────────────── */
+
+.module-card.drums {
+  --mod-color: var(--color-drums);
+  --drums-prefix-w: 92px;    /* mute + label + gaps */
+  --drums-cell-gap: 4px;
+  --drums-beat-gap: 10px;    /* extra space at the start of each beat */
+}
+
+.palette-tile[data-palette-type="drums"] .palette-tile-bar {
+  background: var(--color-drums);
+}
+
+/* Multi-row Step Tracker */
+.drums-tracker {
+  display: flex;
+  flex-direction: column;
+  max-height: 280px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  gap: 5px;
+  padding: 8px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+}
+
+/* Custom scrollbar for drums tracker */
+.drums-tracker::-webkit-scrollbar {
+  width: 4px;
+}
+.drums-tracker::-webkit-scrollbar-track {
+  background: transparent;
+}
+.drums-tracker::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: var(--radius-pill);
+}
+
+/* Column width shared by the header ruler and every track row */
+
+
+/* Numbered ruler above the grid */
+.drums-grid-header {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 0 8px 3px;
+}
+
+.drums-grid-spacer {
+  width: var(--drums-prefix-w);
+  flex: 0 0 var(--drums-prefix-w);
+}
+
+.drums-grid-nums {
+  display: flex;
+  flex: 1;
+  gap: var(--drums-cell-gap);
+}
+
+.drums-grid-num {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.drums-grid-num.downbeat {
+  color: var(--text-secondary);
+}
+
+.drums-grid-num.beat-start {
+  margin-left: var(--drums-beat-gap);
+}
+
+/* Track rows */
+.drums-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
+  transition: background var(--transition-fast) !important;
+  box-sizing: border-box !important;
+}
+
+.drums-row:hover {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Mute button */
+.drums-row-mute {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 3px !important;
+  color: var(--text-dim) !important;
+  font-family: var(--font-mono, monospace) !important;
+  font-size: 0.65rem !important;
+  font-weight: 700 !important;
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  flex: 0 0 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  transition: all var(--transition-fast) !important;
+}
+
+.drums-row-mute:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: var(--text-primary) !important;
+}
+
+.drums-row-mute.muted {
+  background: rgba(255, 70, 70, 0.2) !important;
+  border-color: rgba(255, 70, 70, 0.5) !important;
+  color: #ff7070 !important;
+}
+
+/* Instrument label (read-only on the grid; renamed in the Advanced tab) */
+.drums-row-label {
+  flex: 0 0 62px !important;
+  width: 62px !important;
+  color: var(--text-secondary);
+  font-family: var(--font-main);
+  font-size: 0.72rem !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Step cells (velocity bars) */
+
+/* Drums Module Hide Fader Column */
+.module-card.drums .module-fader-column {
+  display: none !important;
+}
+
+/* Track Controls Row inside Tab Panel */
+.drums-track-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0.5rem;
+  padding: 0 4px;
+}
+
+.drums-track-note-select-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto; /* align to the right */
+}
+
+.drums-track-note-select-group label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.drums-track-note-select-group .drums-note-select {
+  width: 100px !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--text-primary) !important;
+  font-size: 0.72rem !important;
+  padding: 3px 6px !important;
+  box-sizing: border-box !important;
+}
+
+/* Page Row Steps container styled exactly like standard .sequencer-grid */
+.drums-row-steps {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  gap: var(--drums-cell-gap) !important;
+  flex: 1 !important;
+  height: 60px !important; /* matches standard sequencer height */
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 8px !important; /* matches standard sequencer padding */
+  border: 1px solid var(--glass-border) !important;
+  box-sizing: border-box !important;
+}
+
+.drums-cell {
+  position: relative !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 2px !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  cursor: crosshair !important;
+  box-sizing: border-box !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+  transition: background 0.1s !important;
+}
+
+.drums-cell:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Highlight downbeats (steps 1, 5, 9, 13) */
+.drums-cell:nth-child(4n + 1) {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.drums-cell:nth-child(4n + 1):hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.drums-cell.beat-start {
+  margin-left: var(--drums-beat-gap) !important;
+}
+
+.drums-cell.active {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.drums-cell.active:nth-child(4n + 1) {
+  background: rgba(255, 255, 255, 0.22) !important;
+}
+
+.drums-cell.current-step {
+  background: rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.4) !important;
+}
+
+.drums-cell-fill {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 0%;
+  background: var(--color-drums) !important;
+  border-radius: 2px !important;
+  pointer-events: none !important;
+  transition: height 0.05s, transform 0.1s !important;
+  opacity: 0.8;
+}
+
+.drums-cell.active .drums-cell-fill {
+  opacity: 1;
+}
+
+
+
+/* ── Swing / Humanize knobs (Main tab) ──────────────────────────────────── */
+.drums-knobs {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.drums-knob-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 58px;
+}
+
+.drums-knob .cs-pan-arc path {
+  stroke: color-mix(in srgb, var(--color-drums) 28%, transparent);
+}
+
+.drums-knob:hover .cs-pan-knob-body {
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 0 0 1px color-mix(in srgb, var(--color-drums) 25%, transparent);
+}
+
+.drums-knob:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-drums) 45%, transparent);
+  border-radius: 50%;
+}
+
+.drums-knob-name {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.drums-knob-val {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* ── Kit table (Advanced tab) ───────────────────────────────────────────── */
+.drums-kit-maprow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0.6rem;
+}
+
+.drums-kit-maprow label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.drums-kit-maprow select {
+  flex: 1;
+  min-width: 0;
+}
+
+.drums-kit-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0.6rem;
+}
+
+.drums-kit-table th {
+  text-align: left;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  padding: 2px 4px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.drums-kit-table td {
+  padding: 3px 4px;
+  vertical-align: middle;
+}
+
+.drums-track-name-input {
+  width: 100% !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--text-primary) !important;
+  font-size: 0.72rem !important;
+  padding: 3px 6px !important;
+  box-sizing: border-box !important;
+}
+
+.drums-note-select {
+  width: 100% !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--text-primary) !important;
+  font-size: 0.72rem !important;
+  padding: 3px 4px !important;
+  box-sizing: border-box !important;
+}
+
+.drums-kit-table .drums-action-btn {
+  width: 26px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drums-action-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.65rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  transition: all var(--transition-fast);
+}
+
+.drums-action-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.drums-delete-btn {
+  background: rgba(255, 70, 70, 0.1);
+  border: 1px solid rgba(255, 70, 70, 0.2);
+  color: #ff7070;
+}
+
+.drums-delete-btn:hover {
+  background: rgba(255, 70, 70, 0.25);
+  border-color: rgba(255, 70, 70, 0.5);
+  color: white;
+}
+
+.drums-add-track-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 0.8rem;
+}
+
+/* Light Theme overrides for Drums components */
+html[data-theme="light"] .drums-tracker {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+html[data-theme="light"] .drums-row:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+html[data-theme="light"] .drums-row-mute {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: var(--text-dim);
+}
+
+html[data-theme="light"] .drums-row-mute:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--text-secondary);
+}
+
+html[data-theme="light"] .drums-row-mute.muted {
+  background: rgba(214, 48, 64, 0.12);
+  border-color: rgba(214, 48, 64, 0.35);
+  color: var(--color-kick);
+}
+
+html[data-theme="light"] .drums-cell {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+html[data-theme="light"] .drums-row-steps {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html[data-theme="light"] .drums-cell:nth-child(4n + 1) {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+
+html[data-theme="light"] .drums-cell:hover {
+  background: rgba(0, 0, 0, 0.12) !important;
+}
+
+html[data-theme="light"] .drums-cell:nth-child(4n + 1):hover {
+  background: rgba(0, 0, 0, 0.16) !important;
+}
+
+html[data-theme="light"] .drums-cell.active {
+  background: rgba(0, 0, 0, 0.12) !important;
+}
+
+html[data-theme="light"] .drums-cell.active:nth-child(4n + 1) {
+  background: rgba(0, 0, 0, 0.15) !important;
+}
+
+html[data-theme="light"] .drums-cell.current-step {
+  background: rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* ── Drums card: full-width layout (no fader column) ──────────────────── */
+
+/* Expand module-controls-column to full card width when there's no fader */
+.module-card.drums .module-main-row.drums-full-width {
+  display: block !important;
+}
+
+.module-card.drums .module-main-row.drums-full-width .module-controls-column {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* ── Drums card tabs: horizontally scrollable ─────────────────────────── */
+.drums-card-tabs {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  gap: 3px !important;
+  padding-bottom: 2px !important;
+  scrollbar-width: none !important;
+}
+
+.drums-card-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Per-track panel layout ───────────────────────────────────────────── */
+.drums-track-panel-name {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Full-width single-track sequencer row ────────────────────────────── */
+.drums-track-row {
+  display: block !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: none !important;
+}
+
+.drums-track-row .drums-row-steps {
+  width: 100% !important;
+  height: 60px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  gap: 3px !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 6px !important;
+  box-sizing: border-box !important;
+  margin-top: 0 !important;
+}
+
+/* Tracker panel: wraps header + row */
+.drums-tracker-panel {
+  margin-top: 0.4rem;
+}
+
+.drums-tracker-panel .drums-grid-header {
+  padding: 0 0 3px 0;
+}
+
+.drums-tracker-panel .drums-grid-nums {
+  display: flex;
+  flex: 1;
+  gap: 3px;
+}
+
+/* Light theme overrides for new components */
+html[data-theme="light"] .drums-track-row .drums-row-steps {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html[data-theme="light"] .drums-track-panel-name {
+  color: var(--text-primary);
+}
+
+/* Drums Main Tab layout: knobs left, fader right */
+.drums-main-panel-content {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  width: 100% !important;
+}
+
+.drums-left-col {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  flex: 1 !important;
+}
+
+.drums-right-col {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  border-left: 1px solid var(--glass-border) !important;
+  padding-left: 16px !important;
+}
+
+/* Stacking tracks inside a group tab panel: vertical column layout */
+.drums-group-track {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 6px !important;
+  margin-bottom: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+}
+
+.drums-group-track:last-child {
+  border-bottom: none !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Controls header of each track: holds M, S, Play, and instrument name horizontally */
+.drums-track-header-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  flex-shrink: 0 !important;
+}
+
+.drums-group-track .drums-tracker-panel {
+  width: 100% !important;
+  margin-top: 0 !important;
+}
+
+
+
+/* Circular styles for audition (play) and solo buttons to look professional */
+.drums-group-track .drums-action-btn {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  font-size: 0.65rem !important;
+}
+
+/* Solo button styling */
+.drums-row-solo {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 3px !important;
+  color: var(--text-dim) !important;
+  font-family: var(--font-mono, monospace) !important;
+  font-size: 0.65rem !important;
+  font-weight: 700 !important;
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  flex: 0 0 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  transition: all var(--transition-fast) !important;
+}
+
+.drums-row-solo:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: var(--text-primary) !important;
+}
+
+.drums-row-solo.active {
+  background: rgba(255, 210, 0, 0.15) !important;
+  border-color: rgba(255, 200, 0, 0.5) !important;
+  color: #ffd700 !important;
+  box-shadow: 0 0 8px rgba(255, 200, 0, 0.22), inset 0 0 4px rgba(255, 200, 0, 0.08) !important;
+}
+
+/* Light mode overrides for Solo button */
+html[data-theme="light"] .drums-row-solo {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+html[data-theme="light"] .drums-row-solo.active {
+  background: rgba(200, 150, 0, 0.12) !important;
+  border-color: rgba(200, 150, 0, 0.4) !important;
+  color: #c89600 !important;
+}
+
+.drums-group-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.drums-group-panel[hidden] {
+  display: none !important;
+}
+

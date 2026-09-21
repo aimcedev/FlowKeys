@@ -1,0 +1,599 @@
+/* ============================================================
+   Chord Pads — Drawer & UI
+   Uses only variables from theme.css — no new colour values.
+   ============================================================ */
+
+/* ── Drawer ─────────────────────────────────────────────────── */
+
+.chord-pads-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 340px;
+  height: 100vh;
+  background: var(--glass-bg);
+  border-left: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.5);
+  transform: translateX(100%);
+  transition: transform var(--transition-medium);
+  z-index: 99; /* One below settings drawer so they layer naturally */
+  display: flex;
+  flex-direction: column;
+}
+
+.chord-pads-drawer.open {
+  transform: translateX(0);
+}
+
+/* When settings drawer is also open, offset chord pads drawer */
+#midi-mapping-drawer.open ~ .chord-pads-drawer.open,
+.chord-pads-drawer.open ~ #midi-mapping-drawer.open + .chord-pads-drawer {
+  right: 340px;
+}
+
+/* Header */
+.chord-pads-drawer .drawer-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.chord-pads-drawer .drawer-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: white;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.cp-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Edit Pads button in header */
+.cp-edit-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.cp-edit-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  border-color: var(--glass-border-hover);
+}
+
+.cp-edit-btn.active {
+  background: rgba(0, 229, 255, 0.12);
+  border-color: rgba(0, 229, 255, 0.4);
+  color: var(--accent-cyan);
+}
+
+/* Drawer content area */
+.cp-drawer-content {
+  padding: 1.25rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--glass-border) transparent;
+}
+
+/* ── Chord Pads Button (icon in top bar) ────────────────────── */
+
+#chord-pads-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+#chord-pads-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: var(--glass-border-hover);
+}
+
+#chord-pads-btn.active {
+  background: rgba(0, 229, 255, 0.12);
+  border-color: rgba(0, 229, 255, 0.4);
+  color: var(--accent-cyan);
+}
+
+/* ── Controls Row ───────────────────────────────────────────── */
+
+.cp-controls-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+}
+
+.cp-controls-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cp-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.cp-control-group label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+
+.cp-select {
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  width: 56px;
+}
+
+.cp-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cp-slider {
+  flex: 1;
+  height: 3px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--glass-border);
+  border-radius: 99px;
+  outline: none;
+  cursor: pointer;
+}
+
+.cp-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  cursor: pointer;
+}
+
+.cp-slider-val {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.cp-sustain-group {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cp-sustain-group label:first-child {
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* MIDI learn highlight for the Hold toggle group */
+.cp-hold-group.mappable {
+  outline: 1px solid rgba(0, 229, 255, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  cursor: pointer;
+  animation: cp-mappable-pulse 2s ease-in-out infinite;
+}
+
+.cp-hold-group.mapping-active {
+  outline: 2px solid var(--accent-cyan);
+  background: rgba(0, 229, 255, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+}
+
+/* ── Pad Grid ───────────────────────────────────────────────── */
+
+.cp-pad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.cp-pad {
+  position: relative;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.4rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  gap: 0.2rem;
+  transition: all var(--transition-fast);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.cp-pad:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--glass-border-hover);
+}
+
+.cp-pad:active {
+  transform: scale(0.95);
+}
+
+.cp-pad.has-chord::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-dim);
+}
+
+.cp-pad.active {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 229, 255, 0.12);
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.3);
+}
+
+.cp-pad.active::before {
+  background: var(--accent-cyan);
+}
+
+.cp-pad.selected {
+  border-color: var(--accent-magenta);
+  background: rgba(255, 0, 127, 0.08);
+}
+
+.cp-pad.selected::before {
+  background: var(--accent-magenta);
+}
+
+/* MIDI learn mode highlight */
+.cp-pad.mappable {
+  border-color: rgba(0, 229, 255, 0.35);
+  box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.15);
+  animation: cp-mappable-pulse 2s ease-in-out infinite;
+}
+
+@keyframes cp-mappable-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.15); }
+  50%       { box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.3); }
+}
+
+/* "learning" state — assigned by midiMapping selectTarget */
+.cp-pad.mapping-active {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 229, 255, 0.2);
+  box-shadow: 0 0 16px rgba(0, 229, 255, 0.5);
+}
+
+.cp-pad-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  pointer-events: none;
+}
+
+.cp-pad-bind {
+  font-size: 0.62rem;
+  color: var(--accent-cyan);
+  opacity: 0.85;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+/* Delete button inside a binding label — only visible in mapping mode */
+.cp-pad-bind-del {
+  pointer-events: all;
+  background: none;
+  border: none;
+  color: var(--accent-cyan);
+  opacity: 0.7;
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 0 1px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: opacity var(--transition-fast), background var(--transition-fast);
+}
+
+.cp-pad-bind-del:hover {
+  opacity: 1;
+  background: rgba(255, 23, 68, 0.25);
+  color: #ff4d6d;
+}
+
+/* ── Edit Section ───────────────────────────────────────────── */
+
+.cp-edit-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+}
+
+.cp-edit-hint {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  text-align: center;
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+.cp-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cp-edit-row label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  width: 36px;
+}
+
+.cp-name-input {
+  flex: 1;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  font-weight: 600;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.cp-name-input:focus {
+  border-color: var(--accent-cyan);
+}
+
+.cp-notes-info {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+/* ── Mini Piano ─────────────────────────────────────────────── */
+
+.cp-mini-piano-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.3);
+  scrollbar-width: thin;
+  scrollbar-color: var(--glass-border) transparent;
+}
+
+.cp-mini-piano {
+  display: flex;
+  align-items: flex-start;
+  padding: 4px;
+  gap: 2px;
+  min-width: max-content;
+}
+
+.cp-octave {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.cp-white-keys {
+  display: flex;
+  gap: 1px;
+}
+
+.cp-black-keys {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  pointer-events: none;
+}
+
+.cp-key-white {
+  width: 22px;
+  height: 60px;
+  background: rgba(240, 240, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 0 0 4px 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: 3px;
+  transition: background var(--transition-fast);
+  pointer-events: all;
+}
+
+.cp-key-white:hover {
+  background: rgba(200, 220, 255, 0.95);
+}
+
+.cp-key-white:active {
+  background: rgba(150, 200, 255, 0.95);
+}
+
+.cp-key-white.cp-key-active {
+  background: var(--accent-cyan);
+  border-color: rgba(0, 229, 255, 0.6);
+  box-shadow: 0 0 6px rgba(0, 229, 255, 0.5);
+}
+
+.cp-key-label {
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  letter-spacing: -0.02em;
+}
+
+.cp-key-white.cp-key-active .cp-key-label {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.cp-key-black {
+  position: absolute;
+  top: 4px;
+  width: 14px;
+  height: 36px;
+  background: rgba(20, 20, 30, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  border-radius: 0 0 3px 3px;
+  cursor: pointer;
+  z-index: 2;
+  transform: translateX(-50%);
+  transition: background var(--transition-fast);
+  pointer-events: all;
+}
+
+.cp-key-black:hover {
+  background: rgba(50, 50, 70, 0.95);
+}
+
+.cp-key-black:active {
+  background: rgba(80, 80, 100, 0.95);
+}
+
+.cp-key-black.cp-key-active {
+  background: var(--accent-cyan);
+  border-color: rgba(0, 229, 255, 0.6);
+  box-shadow: 0 0 6px rgba(0, 229, 255, 0.5);
+}
+
+/* ── Pad Management Row ─────────────────────────────────────── */
+
+.cp-mgmt-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.cp-action-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.cp-action-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  border-color: var(--glass-border-hover);
+}
+
+.cp-action-btn:active {
+  transform: scale(0.95);
+}
+
+.cp-delete-btn:hover {
+  background: rgba(255, 23, 68, 0.12);
+  border-color: rgba(255, 23, 68, 0.35);
+  color: #ff4d6d;
+}
+
+/* ── Light theme overrides ──────────────────────────────────── */
+
+html[data-theme="light"] .cp-key-white {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+html[data-theme="light"] .cp-key-black {
+  background: rgba(30, 30, 40, 0.9);
+}
+
+html[data-theme="light"] .cp-key-white.cp-key-active {
+  background: var(--accent-cyan);
+}
+
+html[data-theme="light"] .cp-key-black.cp-key-active {
+  background: var(--accent-cyan);
+}
+
+html[data-theme="light"] #chord-pads-btn {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+html[data-theme="light"] #chord-pads-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* ── Mobile Responsive Chord Pads Drawer ── */
+@media screen and (max-width: 900px) {
+  .chord-pads-drawer {
+    width: 100vw;
+  }
+  
+  #midi-mapping-drawer.open ~ .chord-pads-drawer.open,
+  .chord-pads-drawer.open ~ #midi-mapping-drawer.open + .chord-pads-drawer {
+    right: 0;
+  }
+}
+

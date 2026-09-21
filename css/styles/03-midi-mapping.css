@@ -1,0 +1,278 @@
+/* MIDI Mapping Drawer */
+.mapping-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 340px;
+  height: 100vh;
+  background: var(--glass-bg);
+  border-left: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.5);
+  transform: translateX(100%);
+  transition: transform var(--transition-medium);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.mapping-drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drawer-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: white;
+  font-weight: 700;
+}
+
+.drawer-content {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.mapping-controls {
+  margin-bottom: 0;
+}
+
+.learn-instructions {
+  background: rgba(0, 229, 255, 0.1);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  text-align: center;
+  font-weight: 600;
+  animation: pulse 2s infinite;
+  margin-bottom: 1rem;
+}
+
+.mapping-list-container h3 {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+
+.mapping-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mapping-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+}
+
+.mapping-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.mapping-target-name {
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.mapping-data {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-family: monospace;
+}
+
+.delete-mapping-btn {
+  background: rgba(255, 23, 68, 0.1);
+  color: #ff4d6d;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+
+.delete-mapping-btn:hover {
+  background: var(--state-panic);
+  color: white;
+}
+
+/* Learning Mode Visuals for Targets */
+body.is-learning .mappable {
+  position: relative;
+  overflow: visible !important;
+}
+
+body.is-learning .mappable::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  bottom: -4px;
+  left: -4px;
+  border: 2px dashed var(--accent-cyan);
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.5;
+  transition: var(--transition-fast);
+  z-index: 10;
+}
+
+/* Disable interaction with non-mappable elements during learn mode */
+body.is-learning button:not(.mappable):not(.mapping-drawer button),
+body.is-learning input:not(.mappable):not(.mapping-drawer input),
+body.is-learning select:not(.mappable):not(.mapping-drawer select),
+body.is-learning .toggle-switch:not(.mappable):not(.mapping-drawer .toggle-switch),
+body.is-learning .mode-switch-btn:not(.mappable),
+body.is-learning .list-item:not(.mappable),
+body.is-learning .section-card:not(.mappable),
+body.is-learning .seq-step {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+body.is-learning .mappable:hover::after {
+  opacity: 1;
+  background: rgba(0, 229, 255, 0.1);
+  border-style: solid;
+}
+
+body.is-learning .mappable.mapping-active::after {
+  opacity: 1;
+  border-style: solid;
+  border-width: 3px;
+  animation: glow 1.5s infinite;
+}
+
+body.is-learning .mappable.has-mapping::before {
+  content: attr(data-mapping-text);
+  position: absolute;
+  top: -26px;
+  right: -8px;
+  background: var(--state-on);
+  color: var(--bg-dark);
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  z-index: 20;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 230, 118, 0.4);
+  pointer-events: none;
+}
+
+/* Make sure toggles and buttons have position relative for the ::after pseudo element */
+.toggle-switch.mappable,
+button.mappable {
+  position: relative;
+}
+
+/* ── Header mapping labels: flip downward to avoid clipping ─────────────── */
+/* The header's top-bar and header-transport containers clip upward overflow,
+   so labels on header buttons appear BELOW the button into the workspace. */
+
+body.is-learning .header-transport {
+  overflow: visible;
+}
+
+body.is-learning header.top-bar .mappable.has-mapping::before {
+  top: auto;
+  bottom: -26px;
+}
+
+/* Module Size Segmented Control */
+.size-control-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.size-control-row label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.size-selector-group {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+
+html[data-theme="light"] .size-selector-group {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.size-btn {
+  flex: 1;
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: var(--font-main);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  outline: none;
+}
+
+.size-btn:hover {
+  color: var(--text-primary);
+}
+
+.size-btn.active {
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--accent-cyan);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+html[data-theme="light"] .size-btn.active {
+  background: #ffffff;
+  color: var(--accent-cyan);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.size-btn:active {
+  transform: scale(0.96);
+}

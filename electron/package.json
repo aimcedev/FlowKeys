@@ -1,0 +1,19 @@
+{
+  "name": "flow-keys",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Flow Keys — desktop (Electron) host",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "rebuild": "electron-rebuild -f -w @julusian/midi",
+    "smoke": "electron smoke.js"
+  },
+  "dependencies": {
+    "@julusian/midi": "^3.6.1"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^3.7.2",
+    "electron": "^42.3.0"
+  }
+}

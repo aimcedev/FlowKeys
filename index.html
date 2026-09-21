@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flow Keys - Live MIDI Assistant</title>
+  <meta name="description" content="A browser-based MIDI performance tool for keyboard players. Add auto-arranged bass, arps, and pads live.">
+  <link rel="stylesheet" href="css/theme.css?v=22">
+  <link rel="stylesheet" href="css/styles.css?v=47">
+  <link rel="stylesheet" href="css/chord-pads.css?v=1">
+</head>
+<body class="module-size-standard">
+
+  <div class="app-container">
+    
+    <header class="top-bar">
+
+      <!-- Left: Brand + Mode -->
+      <div class="top-bar-left">
+        <div class="brand">
+          <div class="status-dot" id="system-status"></div>
+          <h1>Flow Keys</h1>
+        </div>
+        <div class="mode-switch-container">
+          <div class="mode-switch" role="tablist" aria-label="App mode">
+            <button type="button" class="mode-switch-btn active mappable" data-mode="edit" data-midi-target="setModeEdit" role="tab" aria-selected="true">EDIT</button>
+            <button type="button" class="mode-switch-btn mappable" data-mode="flow" data-midi-target="setModeFlow" role="tab" aria-selected="false">FLOW</button>
+            <button type="button" class="mode-switch-btn mappable" data-mode="live" data-midi-target="setModeLive" role="tab" aria-selected="false">LIVE</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row divider — visible only at ≤1050px, separates brand row from transport row -->
+      <div class="header-row-divider" aria-hidden="true"></div>
+
+      <!-- Center: Unified Transport Strip -->
+      <div class="header-transport">
+
+        <!-- Beat pips + Time Signature -->
+        <div class="transport-beats">
+          <div class="time-sig-selector">
+            <button class="time-sig-btn active" data-sig="4/4">4/4</button>
+            <button class="time-sig-btn" data-sig="3/4">3/4</button>
+            <button class="time-sig-btn" data-sig="6/8">6/8</button>
+          </div>
+          <div class="beat-indicator" id="beat-indicator" title="Current Beat">
+            <!-- Pips are built dynamically by _rebuildBeatPips() -->
+          </div>
+        </div>
+
+        <!-- Master Clock -->
+        <div class="transport-clock">
+          <span class="transport-section-label">Clock</span>
+          <div class="transport-clock-controls">
+            <div class="bpm-input-group">
+              <input type="number" id="master-bpm" class="bpm-input lcd-readout" value="120" min="20" max="300">
+              <div class="bpm-stepper">
+                <button id="bpm-up-btn" class="bpm-step-btn mappable" data-midi-target="bpmUp" title="BPM +1">
+                  <svg width="8" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M5 0L10 6H0Z"/></svg>
+                </button>
+                <button id="bpm-down-btn" class="bpm-step-btn mappable" data-midi-target="bpmDown" title="BPM -1">
+                  <svg width="8" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M5 6L0 0H10Z"/></svg>
+                </button>
+              </div>
+            </div>
+            <button id="tap-tempo-btn" class="tap-btn mappable" data-midi-target="tapTempo">TAP</button>
+          </div>
+        </div>
+
+        <!-- Song Key + Transpose (stacked, centered) -->
+        <div class="transport-key">
+          <div class="transport-key-group">
+            <span class="transport-section-label">Key</span>
+            <select id="song-key-select" class="song-key-select lcd-readout">
+              <option value="0">C</option>
+              <option value="1">C# / Db</option>
+              <option value="2">D</option>
+              <option value="3">D# / Eb</option>
+              <option value="4">E</option>
+              <option value="5">F</option>
+              <option value="6">F# / Gb</option>
+              <option value="7">G</option>
+              <option value="8">G# / Ab</option>
+              <option value="9">A</option>
+              <option value="10">A# / Bb</option>
+              <option value="11">B</option>
+            </select>
+          </div>
+          <div class="transport-key-group">
+            <span class="transport-section-label">Transpose</span>
+            <div class="transpose-controls">
+              <button id="transpose-down-btn" class="transpose-step-btn" title="Transpose down 1 semitone">−</button>
+              <span id="transpose-display" class="transpose-display lcd-readout">0</span>
+              <button id="transpose-up-btn" class="transpose-step-btn" title="Transpose up 1 semitone">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chord Display -->
+        <div class="transport-chord">
+          <span class="transport-section-label">Chord</span>
+          <button id="chord-detector-btn" class="chord-trigger-btn lcd-readout" title="Chord Detector — click to open details">
+            <span id="chord-display-text" class="chord-display-text">—</span>
+          </button>
+        </div>
+
+        <!-- Clock Mode -->
+        <div class="transport-mode">
+          <span class="transport-section-label">Mode</span>
+          <div class="clock-mode-btns">
+            <button class="clock-mode-btn" data-mode="trigger" data-compact-label="Trg">Trigger</button>
+            <button class="clock-mode-btn" data-mode="sync" data-compact-label="Syn">Sync</button>
+            <button class="clock-mode-btn active" data-mode="flow" data-compact-label="Flo">Flow</button>
+          </div>
+        </div>
+
+        <!-- Tempo Tracker trigger + always-visible Lock button -->
+        <div class="transport-tempo-trigger">
+          <div class="tempo-trigger-row">
+            <button id="tempo-trigger-btn" class="tempo-trigger-btn mappable" data-midi-target="tempoTrigger" title="Tempo Tracker — click to open">
+              <svg class="tempo-trigger-wave" width="12" height="9" viewBox="0 0 28 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 8 C4 1, 7 1, 10 8 C13 15, 16 15, 19 8 C22 1, 25 1, 27 8"/>
+              </svg>
+              <span id="tempo-trigger-hint" class="tempo-trigger-hint"></span>
+              <span id="tempo-trigger-bpm" class="tempo-trigger-bpm">—</span>
+            </button>
+            <button id="tempo-lock-header-btn" class="tempo-lock-header-btn mappable" data-midi-target="tempoLock" title="Lock detected BPM">
+              <svg class="tempo-lock-icon tempo-lock-icon--unlocked" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <svg class="tempo-lock-icon tempo-lock-icon--locked" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </button>
+          </div>
+          <canvas id="tempo-mini-canvas" class="tempo-mini-canvas"></canvas>
+        </div>
+
+      </div>
+
+      <!-- Right: MIDI Monitor + Actions -->
+      <div class="top-bar-right">
+        <div class="midi-activity-monitor">
+          <span class="midi-activity-title">MIDI</span>
+          <div class="midi-activity-lanes">
+            <div class="midi-activity-lane">
+              <div class="midi-activity-dot" id="midi-in-dot"></div>
+              <span class="midi-activity-lane-label">IN</span>
+            </div>
+            <div class="midi-activity-lane">
+              <div class="midi-activity-dot midi-activity-dot--out" id="midi-out-dot"></div>
+              <span class="midi-activity-lane-label">OUT</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="top-bar-actions">
+          <button id="chord-pads-btn" title="Chord Pads">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="5" height="5" rx="1"/>
+              <rect x="9.5" y="2" width="5" height="5" rx="1"/>
+              <rect x="17" y="2" width="5" height="5" rx="1"/>
+              <rect x="2" y="9.5" width="5" height="5" rx="1"/>
+              <rect x="9.5" y="9.5" width="5" height="5" rx="1"/>
+              <rect x="17" y="9.5" width="5" height="5" rx="1"/>
+              <rect x="2" y="17" width="5" height="5" rx="1"/>
+              <rect x="9.5" y="17" width="5" height="5" rx="1"/>
+              <rect x="17" y="17" width="5" height="5" rx="1"/>
+            </svg>
+          </button>
+          <button id="midi-mapping-btn" class="icon-btn mappable settings-icon-btn" data-midi-target="toggleMapping" title="MIDI Mapping">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" y1="21" x2="4" y2="14"></line>
+              <line x1="4" y1="10" x2="4" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12" y2="3"></line>
+              <line x1="20" y1="21" x2="20" y2="16"></line>
+              <line x1="20" y1="12" x2="20" y2="3"></line>
+              <line x1="1" y1="14" x2="7" y2="14"></line>
+              <line x1="9" y1="8" x2="15" y2="8"></line>
+              <line x1="17" y1="16" x2="23" y2="16"></line>
+            </svg>
+          </button>
+          <button id="settings-btn" class="icon-btn settings-icon-btn" title="Settings">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+          <button class="panic-btn mappable" id="panic-button" data-midi-target="panic">
+            <svg class="panic-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            Panic
+          </button>
+        </div>
+      </div>
+
+    </header>
+
+    <!-- Tempo Tracker Popover — floats below the header, anchored to the trigger button -->
+    <div id="tempo-popover" class="tempo-popover">
+      <div class="tempo-widget" id="tempo-widget">
+        <div class="tempo-widget-header">
+          <span class="tempo-widget-label">Tempo Tracker</span>
+          <span class="tempo-timesig-badge" id="tempo-timesig-badge">4/4</span>
+          <div class="tempo-controls-row">
+            <button class="tempo-hint-btn mappable" data-hint="slow" data-midi-target="tempoHintSlow">Slow</button>
+            <button class="tempo-hint-btn mappable" data-hint="medium" data-midi-target="tempoHintMedium">Med</button>
+            <button class="tempo-hint-btn mappable" data-hint="fast" data-midi-target="tempoHintFast">Fast</button>
+            <button id="tempo-reset-btn" class="tempo-reset-btn mappable" data-midi-target="tempoReset" title="Reset tempo detection">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-5.09"></path></svg>
+              Reset
+            </button>
+            <button id="tempo-lock-btn" class="tempo-lock-btn mappable" data-midi-target="tempoLock" title="Lock detected BPM to master clock">
+              <svg class="tempo-lock-icon tempo-lock-icon--unlocked" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <svg class="tempo-lock-icon tempo-lock-icon--locked" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              <span class="tempo-lock-label">Lock</span>
+            </button>
+          </div>
+        </div>
+        <div class="tempo-widget-body">
+          <div class="tempo-left">
+            <div class="tempo-bpm-block">
+              <span class="tempo-bpm-value waiting" id="tempo-bpm-value">---</span>
+              <span class="tempo-bpm-unit">BPM</span>
+            </div>
+            <div class="tempo-conf-track">
+              <div class="tempo-conf-bar" id="tempo-conf-bar"></div>
+            </div>
+          </div>
+          <canvas id="tempo-dist-canvas" class="tempo-dist-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chord Detector Popover — floats below the header, anchored to the chord button -->
+    <div id="chord-popover" class="chord-popover">
+      <div class="chord-widget" id="chord-widget">
+        <div class="chord-widget-header">
+          <span class="chord-widget-title">Chord Analyzer</span>
+          <div class="chord-controls-row">
+            <button id="chord-reset-btn" class="chord-reset-btn" title="Reset history & active notes">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-5.09"></path></svg>
+              Reset
+            </button>
+            <button id="chord-settings-btn" class="chord-settings-btn" title="Configure settings">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="chord-widget-body">
+          <div class="chord-history-section">
+            <span class="chord-sub-label">Recent Chords</span>
+            <div class="chord-history-bar" id="chord-history-bar">
+              <div class="chord-history-card empty-slot"><div class="chc-chord">—</div></div>
+              <div class="chord-history-card empty-slot"><div class="chc-chord">—</div></div>
+              <div class="chord-history-card empty-slot"><div class="chc-chord">—</div></div>
+              <div class="chord-history-card empty-slot"><div class="chc-chord">—</div></div>
+            </div>
+          </div>
+          
+          <div class="chord-candidates-section">
+            <span class="chord-sub-label">Candidates</span>
+            <div class="chord-table-scroll">
+              <table id="chord-cand-table">
+                <tbody>
+                  <tr><td class="empty-state">No notes played</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="workspace">
+      
+      <!-- EDIT MODE VIEW -->
+      <div id="edit-mode-view" class="mode-view active">
+        <!-- Left Column: Routing & Vis -->
+        <section class="routing-sidebar">
+
+        <!-- Edit Mode: Arrangement Panel -->
+        <div id="edit-context-bar" class="edit-context-bar" style="display: none;">
+          <div class="arrangement-header">
+            <h2>Arrangement</h2>
+            <div id="edit-save-status" class="edit-save-status">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span id="edit-save-btn-label">Auto-Saved</span>
+            </div>
+          </div>
+
+          <!-- Song Row with Custom Actions -->
+          <div class="edit-song-row">
+            <div class="song-select-container">
+              <select id="edit-context-song" class="edit-context-song"></select>
+            </div>
+            <div class="song-actions">
+              <button id="edit-rename-song-btn" class="icon-btn" title="Rename Song">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              </button>
+              <button id="edit-delete-song-btn" class="icon-btn" title="Delete Song">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+              </button>
+              <button id="edit-add-song-btn" class="icon-btn" title="Add Song">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Section Mini-Timeline / Cards Grid -->
+          <div class="edit-sections-container">
+            <div id="edit-sections-list" class="edit-sections-list">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Arrangement Actions Footer -->
+          <div class="arrangement-footer">
+            <button id="edit-add-section-btn" class="add-section-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Add Section</span>
+            </button>
+          </div>
+        </div>
+
+
+
+
+
+        <!-- Flow Rail playhead: stamp EDIT parameters at this CC -->
+        <div class="flow-edit-playhead" id="flow-edit-playhead">
+          <div class="flow-edit-playhead-header">
+            <h2>Flow</h2>
+            <span id="flow-edit-playhead-cc">CC 0</span>
+          </div>
+          <button type="button" class="flow-edit-source mappable" id="flow-edit-source-btn" data-midi-target="flowRailSource" title="MIDI Learn: assign a CC to drive the Flow Rail">Source · Mod Wheel</button>
+          <p class="flow-edit-playhead-hint">Playhead for Add Flow Point</p>
+          <div class="flow-edit-playhead-stage">
+            <canvas id="flow-edit-playhead-canvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Module Palette: drag tiles into the grid to add modules -->
+        <div class="module-palette">
+          <h2>Modules</h2>
+          <p class="palette-hint">Drag into the workspace to add</p>
+          <div class="palette-tiles">
+
+            <div class="palette-tile" data-palette-type="bass">
+              <div class="palette-tile-bar"></div>
+              <div class="palette-tile-info">
+                <span class="palette-tile-name">Bass</span>
+                <span class="palette-tile-desc">Tracks lowest held note</span>
+              </div>
+              <svg class="palette-tile-grip" width="12" height="16" viewBox="0 0 12 16" fill="currentColor" opacity="0.35"><circle cx="3" cy="2" r="1.5"/><circle cx="9" cy="2" r="1.5"/><circle cx="3" cy="6" r="1.5"/><circle cx="9" cy="6" r="1.5"/><circle cx="3" cy="10" r="1.5"/><circle cx="9" cy="10" r="1.5"/><circle cx="3" cy="14" r="1.5"/><circle cx="9" cy="14" r="1.5"/></svg>
+            </div>
+
+            <div class="palette-tile" data-palette-type="arp">
+              <div class="palette-tile-bar"></div>
+              <div class="palette-tile-info">
+                <span class="palette-tile-name">Arp</span>
+                <span class="palette-tile-desc">Rhythmic chord pattern</span>
+              </div>
+              <svg class="palette-tile-grip" width="12" height="16" viewBox="0 0 12 16" fill="currentColor" opacity="0.35"><circle cx="3" cy="2" r="1.5"/><circle cx="9" cy="2" r="1.5"/><circle cx="3" cy="6" r="1.5"/><circle cx="9" cy="6" r="1.5"/><circle cx="3" cy="10" r="1.5"/><circle cx="9" cy="10" r="1.5"/><circle cx="3" cy="14" r="1.5"/><circle cx="9" cy="14" r="1.5"/></svg>
+            </div>
+
+            <div class="palette-tile" data-palette-type="pad">
+              <div class="palette-tile-bar"></div>
+              <div class="palette-tile-info">
+                <span class="palette-tile-name">Drone</span>
+                <span class="palette-tile-desc">Root-fifth drone layer</span>
+              </div>
+              <svg class="palette-tile-grip" width="12" height="16" viewBox="0 0 12 16" fill="currentColor" opacity="0.35"><circle cx="3" cy="2" r="1.5"/><circle cx="9" cy="2" r="1.5"/><circle cx="3" cy="6" r="1.5"/><circle cx="9" cy="6" r="1.5"/><circle cx="3" cy="10" r="1.5"/><circle cx="9" cy="10" r="1.5"/><circle cx="3" cy="14" r="1.5"/><circle cx="9" cy="14" r="1.5"/></svg>
+            </div>
+
+            <div class="palette-tile" data-palette-type="percussion">
+              <div class="palette-tile-bar"></div>
+              <div class="palette-tile-info">
+                <span class="palette-tile-name">Percussion</span>
+                <span class="palette-tile-desc">16-step drum sequencer</span>
+              </div>
+              <svg class="palette-tile-grip" width="12" height="16" viewBox="0 0 12 16" fill="currentColor" opacity="0.35"><circle cx="3" cy="2" r="1.5"/><circle cx="9" cy="2" r="1.5"/><circle cx="3" cy="6" r="1.5"/><circle cx="9" cy="6" r="1.5"/><circle cx="3" cy="10" r="1.5"/><circle cx="9" cy="10" r="1.5"/><circle cx="3" cy="14" r="1.5"/><circle cx="9" cy="14" r="1.5"/></svg>
+            </div>
+
+            <div class="palette-tile" data-palette-type="keyboard">
+              <div class="palette-tile-bar"></div>
+              <div class="palette-tile-info">
+                <span class="palette-tile-name">Keyboard</span>
+                <span class="palette-tile-desc">Duplicate with mod wheel</span>
+              </div>
+              <svg class="palette-tile-grip" width="12" height="16" viewBox="0 0 12 16" fill="currentColor" opacity="0.35"><circle cx="3" cy="2" r="1.5"/><circle cx="9" cy="2" r="1.5"/><circle cx="3" cy="6" r="1.5"/><circle cx="9" cy="6" r="1.5"/><circle cx="3" cy="10" r="1.5"/><circle cx="9" cy="10" r="1.5"/><circle cx="3" cy="14" r="1.5"/><circle cx="9" cy="14" r="1.5"/></svg>
+            </div>
+
+            <div class="palette-tile" data-palette-type="swell">
+              <div class="palette-tile-bar"></div>
+              <div class="palette-tile-info">
+                <span class="palette-tile-name">Swell</span>
+                <span class="palette-tile-desc">Volume-pedal swell effect</span>
+              </div>
+              <svg class="palette-tile-grip" width="12" height="16" viewBox="0 0 12 16" fill="currentColor" opacity="0.35"><circle cx="3" cy="2" r="1.5"/><circle cx="9" cy="2" r="1.5"/><circle cx="3" cy="6" r="1.5"/><circle cx="9" cy="6" r="1.5"/><circle cx="3" cy="10" r="1.5"/><circle cx="9" cy="10" r="1.5"/><circle cx="3" cy="14" r="1.5"/><circle cx="9" cy="14" r="1.5"/></svg>
+            </div>
+
+            <div class="palette-tile" data-palette-type="looper">
+              <div class="palette-tile-bar"></div>
+              <div class="palette-tile-info">
+                <span class="palette-tile-name">Looper</span>
+                <span class="palette-tile-desc">Record &amp; loop in real time</span>
+              </div>
+              <svg class="palette-tile-grip" width="12" height="16" viewBox="0 0 12 16" fill="currentColor" opacity="0.35"><circle cx="3" cy="2" r="1.5"/><circle cx="9" cy="2" r="1.5"/><circle cx="3" cy="6" r="1.5"/><circle cx="9" cy="6" r="1.5"/><circle cx="3" cy="10" r="1.5"/><circle cx="9" cy="10" r="1.5"/><circle cx="3" cy="14" r="1.5"/><circle cx="9" cy="14" r="1.5"/></svg>
+            </div>
+
+            <div class="palette-tile" data-palette-type="glide">
+              <div class="palette-tile-bar"></div>
+              <div class="palette-tile-info">
+                <span class="palette-tile-name">Glide</span>
+                <span class="palette-tile-desc">MPE chord portamento</span>
+              </div>
+              <svg class="palette-tile-grip" width="12" height="16" viewBox="0 0 12 16" fill="currentColor" opacity="0.35"><circle cx="3" cy="2" r="1.5"/><circle cx="9" cy="2" r="1.5"/><circle cx="3" cy="6" r="1.5"/><circle cx="9" cy="6" r="1.5"/><circle cx="3" cy="10" r="1.5"/><circle cx="9" cy="10" r="1.5"/><circle cx="3" cy="14" r="1.5"/><circle cx="9" cy="14" r="1.5"/></svg>
+            </div>
+            
+            <div class="palette-tile" data-palette-type="drums">
+              <div class="palette-tile-bar"></div>
+              <div class="palette-tile-info">
+                <span class="palette-tile-name">Drum Kit</span>
+                <span class="palette-tile-desc">Multi-track drum sequencer</span>
+              </div>
+              <svg class="palette-tile-grip" width="12" height="16" viewBox="0 0 12 16" fill="currentColor" opacity="0.35"><circle cx="3" cy="2" r="1.5"/><circle cx="9" cy="2" r="1.5"/><circle cx="3" cy="6" r="1.5"/><circle cx="9" cy="6" r="1.5"/><circle cx="3" cy="10" r="1.5"/><circle cx="9" cy="10" r="1.5"/><circle cx="3" cy="14" r="1.5"/><circle cx="9" cy="14" r="1.5"/></svg>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="activity-view">
+          <h2>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            Activity Monitor
+          </h2>
+          <div class="visualizer-container">
+            <canvas id="activityCanvas"></canvas>
+          </div>
+        </div>
+        
+      </section>
+
+      <!-- Right Column: Modules (rendered dynamically by app.renderModules()) -->
+      <section class="modules-grid" id="modules-grid">
+      </section>
+
+      <!-- FAB: Add Module — visible only at ≤900px when palette is a drawer -->
+      <button id="add-module-fab" class="add-module-fab" title="Add Module" aria-label="Add Module">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+      <!-- Backdrop for module palette drawer -->
+      <div id="palette-drawer-backdrop" class="palette-drawer-backdrop"></div>
+
+      </div> <!-- End Edit Mode View -->
+
+      <!-- FLOW MODE VIEW -->
+      <div id="flow-mode-view" class="mode-view">
+        <div class="flow-rail-workspace">
+          <div class="flow-rail-main">
+            <header class="flow-rail-chrome">
+              <div class="flow-rail-context">
+                <span id="flow-rail-song-name">Song</span>
+                <span class="flow-rail-sep">/</span>
+                <span id="flow-rail-section-name">Section</span>
+              </div>
+              <div class="flow-rail-nav">
+                <button class="icon-btn nav-btn-large mappable" id="flow-prev-section-btn" data-midi-target="prevSection" title="Previous Section">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button class="icon-btn nav-btn-large mappable" id="flow-next-section-btn" data-midi-target="nextSection" title="Next Section">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+              </div>
+              <div class="flow-rail-source-group">
+                <button type="button" class="flow-rail-source mappable" id="flow-rail-source-label" data-midi-target="flowRailSource" title="MIDI Learn: assign a CC to drive the Flow Rail">CC 01 · MOD WHEEL</button>
+                <label class="flow-rail-curve">
+                  <span>Curve</span>
+                  <select id="flow-source-curve" title="Incoming controller response curve"></select>
+                </label>
+              </div>
+              <button id="flow-configure-toggle-btn" class="live-edit-toggle mappable" data-midi-target="toggleFlowConfigure" title="Shape Flow mappings" aria-expanded="false" aria-controls="flow-rail-drawer">Shape</button>
+            </header>
+            <div class="flow-status">
+              <div class="flow-position"><span class="flow-eyebrow">FLOW</span><output id="flow-position-value" for="flow-position-slider">0%</output><span id="flow-position-cc">CC 0 / 127</span></div>
+              <div class="flow-status-copy"><span class="flow-performance-hint">Move your pedal. Scroll sideways to explore instruments.</span><span class="flow-shape-hint">Select a sound to shape its response.</span><span id="flow-current-annotation"></span></div>
+            </div>
+            <div class="flow-groove" id="flow-groove" data-state="free">
+              <div class="flow-groove-copy" role="status" aria-live="polite" aria-atomic="true">
+                <strong id="flow-groove-state">Out of groove</strong>
+                <span id="flow-groove-detail">Cross an on/off point to arm the groove.</span>
+              </div>
+              <div class="flow-groove-beats" id="flow-groove-beats" aria-hidden="true"></div>
+            </div>
+            <div class="flow-performance">
+              <div class="flow-slider-well">
+                <span aria-hidden="true">127</span>
+                <input type="range" id="flow-position-slider" min="0" max="127" step="1" value="0" aria-label="Flow position" aria-orientation="vertical">
+                <span aria-hidden="true">0</span><span class="flow-slider-caption">FLOW</span>
+              </div>
+              <div class="flow-landscape-scroll" tabindex="0" role="region" aria-label="Flow sounds; scroll horizontally for more">
+                <div id="flow-landscape">
+                  <div class="flow-rail-stage">
+                    <div id="flow-card-controls" aria-label="Instrument cards"></div>
+                    <canvas id="flow-rail-canvas" aria-label="Sound response ribbons. Select a sound below to inspect it."></canvas>
+                    <div class="flow-rail-empty" id="flow-rail-empty" hidden><strong>Your sound, in motion.</strong><p>Connect a sound parameter to your pedal to begin.</p><button type="button" id="flow-first-mapping-btn">Add your first mapping</button></div>
+                  </div>
+                  <div id="flow-sound-strip" aria-label="Sound values"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="flow-rail-drawer" id="flow-rail-drawer">
+            <div class="flow-rail-drawer-header">
+              <h2>Mappings</h2>
+              <button type="button" id="flow-add-mapping-btn">+ Add Mapping</button>
+            </div>
+            <ul id="flow-mapping-list"></ul>
+            <div id="flow-mapping-inspector"></div>
+            <div id="flow-add-mapping-picker" hidden></div>
+            <details class="flow-checkpoint-editor">
+              <summary>Checkpoints <span>Optional</span></summary>
+              <div id="flow-checkpoint-list"></div>
+              <button type="button" class="flow-add-point-btn" id="flow-add-checkpoint-btn">+ Add at current position</button>
+            </details>
+            <div class="flow-rail-source-row">
+              <button type="button" id="flow-learn-source-btn">Learn Source</button>
+              <button type="button" id="flow-reset-source-btn">Default CC</button>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <!-- LIVE MODE VIEW -->
+      <div id="live-mode-view" class="mode-view">
+        <section class="live-sidebar">
+          <div class="live-sidebar-header">
+            <h2>Songs</h2>
+            <div class="live-sidebar-actions">
+              <button id="live-edit-toggle-btn" class="live-edit-toggle mappable" data-midi-target="toggleLiveEdit" title="Toggle Edit Layout">
+                <span class="icon-span">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lock-icon"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </span>
+                <span class="text-span">LOCKED</span>
+              </button>
+              <!-- Hidden unless in live-edit mode -->
+              <button id="add-song-btn" class="icon-btn live-edit-only add-song-btn" title="Add New Song">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              </button>
+            </div>
+          </div>
+          <ul id="song-list" class="song-list">
+            <!-- Songs injected here -->
+          </ul>
+        </section>
+        
+        <section class="live-content">
+          <div class="live-content-header" id="live-content-header">
+            <div class="live-content-header-left">
+              <h2 id="current-song-title">Select a Song</h2>
+            </div>
+            <div class="live-actions" id="live-actions">
+              <!-- Hidden unless in live-edit mode -->
+              <button class="save-section-btn live-edit-only" id="save-current-state-btn">+ Add Section</button>
+              
+              <button class="icon-btn nav-btn-large mappable" id="prev-section-btn" data-midi-target="prevSection" title="Previous Section">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <button class="icon-btn nav-btn-large mappable" id="next-section-btn" data-midi-target="nextSection" title="Next Section">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div id="section-grid" class="section-grid">
+            <!-- Sections injected here -->
+            <div class="empty-state">No song selected.</div>
+          </div>
+        </section>
+      </div> <!-- End Live Mode View -->
+
+    </main>
+
+    <!-- Settings Drawer -->
+    <aside id="midi-mapping-drawer" class="mapping-drawer">
+      <div class="drawer-header">
+        <h2>Settings</h2>
+        <button id="close-mapping-btn" class="icon-btn close-btn" title="Close Settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="drawer-content">
+
+        <!-- MIDI Device Selection -->
+        <div class="pass-through-panel midi-device-panel">
+          <h3>MIDI Devices</h3>
+          <div class="control-row">
+            <label for="midi-input">MIDI In</label>
+            <select id="midi-input">
+              <option value="">Searching...</option>
+            </select>
+          </div>
+          <div class="control-row">
+            <label for="midi-output">IAC Out</label>
+            <select id="midi-output">
+              <option value="">Searching...</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mapping-controls pass-through-panel">
+          <div class="control-row mapping-control-row">
+            <label class="flex-1">Learn Mode</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="mapping-learn-toggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <p class="learn-instructions" id="learn-instructions">Select a control to map...</p>
+          <div class="control-row">
+            <label>Input Device</label>
+            <select id="mapping-input-device">
+              <option value="any">Any Device</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="mapping-list-container">
+          <h3>Active Mappings</h3>
+          <ul id="mapping-list" class="mapping-list">
+            <!-- Mappings will be populated here -->
+          </ul>
+        </div>
+
+        <p class="drawer-settings-link-row">
+          <button type="button" id="open-settings-from-drawer" class="text-link-btn">Open full Settings…</button>
+        </p>
+
+      </div>
+    </aside>
+
+    <!-- Settings Window (modal) -->
+    <div id="settings-modal" class="settings-modal" aria-hidden="true">
+      <div class="settings-modal-backdrop" id="settings-modal-backdrop"></div>
+      <div class="settings-modal-panel" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+        <div class="settings-modal-header">
+          <h2 id="settings-modal-title">Settings</h2>
+          <button id="settings-modal-close" class="icon-btn close-btn" title="Close Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="settings-modal-body">
+          <nav class="settings-tabs" role="tablist" aria-label="Settings sections">
+            <button class="settings-tab active" data-tab="general" role="tab" aria-selected="true">General</button>
+            <button class="settings-tab" data-tab="midi" role="tab" aria-selected="false">MIDI &amp; Sync</button>
+            <button class="settings-tab" data-tab="defaults" role="tab" aria-selected="false">Defaults</button>
+            <button class="settings-tab" data-tab="chord-detector" role="tab" aria-selected="false">Chord Detector</button>
+            <button class="settings-tab" data-tab="data" role="tab" aria-selected="false">Data</button>
+            <button class="settings-tab" data-tab="about" role="tab" aria-selected="false">About</button>
+          </nav>
+
+          <div class="settings-panes">
+
+            <!-- ── General ───────────────────────────────────── -->
+            <section class="settings-pane active" data-pane="general" role="tabpanel">
+              <div class="pass-through-panel appearance-panel">
+                <h3>Appearance</h3>
+                <div class="control-row">
+                  <label for="theme-toggle">Light Mode</label>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="size-control-row">
+                  <label>Module Size</label>
+                  <div class="size-selector-group" id="module-size-selector">
+                    <button class="size-btn" data-size="compact">Compact</button>
+                    <button class="size-btn" data-size="standard">Standard</button>
+                    <button class="size-btn" data-size="spacious">Spacious</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ── MIDI & Sync ───────────────────────────────── -->
+            <section class="settings-pane" data-pane="midi" role="tabpanel">
+              <div class="pass-through-panel clock-send-panel">
+                <h3>MIDI Clock Out</h3>
+                <p>Send MIDI clock (24 PPQ) and start/stop on the selected output so a DAW or hardware follows Flow Keys' tempo.</p>
+                <div class="control-row">
+                  <label for="clock-send-toggle">Send MIDI Clock</label>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="clock-send-toggle">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="pass-through-panel cc-remap-panel">
+                <h3>Controller CCs</h3>
+                <p>Match these to your controller if it doesn't use the General MIDI defaults (Sustain 64, Mod Wheel 1).</p>
+                <div class="control-row">
+                  <label for="cc-sustain-input">Sustain CC</label>
+                  <input type="number" id="cc-sustain-input" class="settings-num-input" min="0" max="127" value="64">
+                </div>
+                <div class="control-row">
+                  <label for="cc-modwheel-input">Mod Wheel CC</label>
+                  <input type="number" id="cc-modwheel-input" class="settings-num-input" min="0" max="127" value="1">
+                </div>
+              </div>
+            </section>
+
+            <!-- ── Defaults ──────────────────────────────────── -->
+            <section class="settings-pane" data-pane="defaults" role="tabpanel">
+              <div class="pass-through-panel new-song-defaults-panel">
+                <h3>New Song Defaults</h3>
+                <p>Applied when you create a new song. Existing songs are unaffected.</p>
+                <div class="control-row">
+                  <label for="default-transition-mode">Transition Mode</label>
+                  <select id="default-transition-mode" class="settings-select">
+                    <option value="trigger">Trigger</option>
+                    <option value="sync">Sync</option>
+                    <option value="flow">Flow</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            <!-- ── Chord Detector ────────────────────────────── -->
+            <section class="settings-pane" data-pane="chord-detector" role="tabpanel">
+              <div class="pass-through-panel chord-settings-panel">
+                <h3>Chord Analysis Settings</h3>
+                <div class="control-row">
+                  <label for="chord-setting-layout">Display Layout</label>
+                  <select id="chord-setting-layout" class="settings-select">
+                    <option value="chords-only">Actual Chords Only</option>
+                    <option value="nashville-only">Nashville Number Only</option>
+                    <option value="both" selected>Both (Stacked)</option>
+                    <option value="both-alts">Both with Alternatives</option>
+                    <option value="compact">Compact (Side-by-Side)</option>
+                  </select>
+                </div>
+                <div class="control-row">
+                  <label for="chord-setting-font-size">Display Size</label>
+                  <select id="chord-setting-font-size" class="settings-select">
+                    <option value="normal">Normal</option>
+                    <option value="medium">Medium</option>
+                    <option value="large">Large</option>
+                  </select>
+                </div>
+                <div class="control-row">
+                  <label for="chord-setting-interp">Interpretation</label>
+                  <select id="chord-setting-interp" class="settings-select">
+                    <option value="literal">Literal</option>
+                    <option value="smart">Smart</option>
+                  </select>
+                </div>
+                <div class="control-row">
+                  <label for="chord-setting-nv-minor">Nashville Minor Mode</label>
+                  <select id="chord-setting-nv-minor" class="settings-select">
+                    <option value="1m">minor as 1m</option>
+                    <option value="relative6m">relative (6m)</option>
+                    <option value="majorRelative">major-relative</option>
+                  </select>
+                </div>
+                <div class="control-row">
+                  <label for="chord-setting-nv-symbol">Minor Symbol</label>
+                  <select id="chord-setting-nv-symbol" class="settings-select">
+                    <option value="m">m</option>
+                    <option value="-">dash (-)</option>
+                  </select>
+                </div>
+                <div class="control-row">
+                  <label for="chord-setting-slash-sus">Sus Chord Style</label>
+                  <select id="chord-setting-slash-sus" class="settings-select">
+                    <option value="sus">Standard (e.g. 9sus4)</option>
+                    <option value="slash">Slash Chord (e.g. 4/5)</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            <!-- ── Data ──────────────────────────────────────── -->
+            <section class="settings-pane" data-pane="data" role="tabpanel">
+              <div class="pass-through-panel show-files-panel">
+                <h3>Show Files</h3>
+                <div class="show-active-row">
+                  <span class="show-active-label">Active Show:</span>
+                  <span class="show-active-name" id="active-show-name">Default Show</span>
+                </div>
+                <div class="show-control-buttons">
+                  <button id="show-save-btn" type="button" class="preset-io-btn" title="Save current state to active show">Save Active</button>
+                  <button id="show-save-as-btn" type="button" class="preset-io-btn" title="Save current state as a new show">Save As...</button>
+                  <button id="show-new-btn" type="button" class="preset-io-btn" title="Create a new clean slate show">New Show</button>
+                </div>
+                <div class="show-list-container">
+                  <ul id="local-shows-list" class="local-shows-list">
+                    <!-- Show items populated dynamically -->
+                  </ul>
+                </div>
+                <div class="show-import-row">
+                  <label class="preset-io-btn preset-import-label" title="Import show from JSON file">
+                    Import Show File
+                    <input id="import-show-input" type="file" accept=".json" style="display:none;">
+                  </label>
+                </div>
+              </div>
+
+              <div class="pass-through-panel presets-export-panel">
+                <h3>Module Presets</h3>
+                <p>Export your saved patterns as a JSON file, or import a file to load them back in.</p>
+                <div class="preset-io-row">
+                  <button id="export-presets-btn" type="button" class="preset-io-btn">
+                    Export Presets
+                  </button>
+                  <label class="preset-io-btn preset-import-label" title="Import presets from JSON file">
+                    Import Presets
+                    <input id="import-presets-input" type="file" accept=".json" style="display:none;">
+                  </label>
+                </div>
+              </div>
+
+              <div class="pass-through-panel backup-panel">
+                <h3>Backup &amp; Reset</h3>
+                <p>Export everything (songs, shows, mappings, presets, settings) to one file, or wipe all Flow Keys data and start fresh.</p>
+                <div class="preset-io-row">
+                  <button id="export-all-btn" type="button" class="preset-io-btn">Export Everything</button>
+                  <button id="reset-app-btn" type="button" class="preset-io-btn danger-btn">Reset to Factory</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ── About ─────────────────────────────────────── -->
+            <section class="settings-pane" data-pane="about" role="tabpanel">
+              <div class="pass-through-panel about-panel">
+                <h3>Flow Keys</h3>
+                <p class="about-version">Version <span id="app-version">—</span></p>
+                <p>A browser-based MIDI performance tool for keyboard players.</p>
+                <h3 style="margin-top: 1.5rem;">Keyboard Shortcuts</h3>
+                <ul class="shortcuts-list">
+                  <li><kbd>Esc</kbd><span>Close the open drawer, dialog, or this window</span></li>
+                </ul>
+              </div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chord Pads Drawer -->
+    <aside id="chord-pads-drawer" class="chord-pads-drawer">
+      <div class="drawer-header">
+        <h2>Chord Pads</h2>
+        <div class="cp-header-actions">
+          <button id="cp-edit-toggle-btn" class="cp-edit-btn">Edit Pads</button>
+          <button id="cp-map-btn" class="cp-edit-btn">Map</button>
+          <button id="close-chord-pads-btn" class="icon-btn close-btn" title="Close Chord Pads">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="cp-drawer-content">
+        <!-- Rendered dynamically by ChordPadsPanel -->
+      </div>
+    </aside>
+
+    <!-- Custom Naming Modal -->
+    <div id="naming-modal-overlay" class="modal-overlay">
+      <div class="modal-content">
+        <h3 id="naming-modal-title">Enter Name</h3>
+        <p id="naming-modal-subtitle" class="modal-subtitle"></p>
+        <input type="text" id="naming-modal-input" placeholder="Name..." autocomplete="off">
+        <div class="modal-actions">
+          <button id="naming-modal-cancel" class="modal-cancel-btn">Cancel</button>
+          <button id="naming-modal-save" class="modal-save-btn">Save</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="js/ui/appUiManager.js?v=16"></script>
+  <script type="module" src="js/app.js?v=43"></script>
+</body>
+</html>

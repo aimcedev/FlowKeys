@@ -1,0 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import 'theme.css';
+
+@import './styles/01-layout-transport.css';
+@import './styles/02-workspace-modules-sequencer.css';
+@import './styles/03-midi-mapping.css';
+@import './styles/04-responsive.css';
+@import './styles/05-modes-live.css';
+@import './styles/06-modals-toasts-actions.css';
+@import './styles/07-edit-context-midi-targets.css';
+@import './styles/08-tempo-widget.css';
+@import './styles/09-drag-palette-activity.css';
+@import './styles/10-presets-context-menu.css';
+@import './styles/11-settings-window.css';
+@import './styles/12-chord-detector.css';
+@import './styles/13-flow-rail.css?v=7';
